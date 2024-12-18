@@ -7,7 +7,7 @@ services:
       - ./linux/searxng:/etc/searxng
     restart: always
   open-webui:
-    image: ghcr.io/open-webui/open-webui@sha256:01fe71e722088474496064ff781631698898cd9cbf37a7a7a7a89da3e3dc975e
+    image: ghcr.io/open-webui/open-webui@sha256:c1e4f0927fb0acd53bcbd8bbc92ecaf7ca36a23ee4cb8f25ce90c541012a473a
     ports:
       - "11500:8080"
     volumes:

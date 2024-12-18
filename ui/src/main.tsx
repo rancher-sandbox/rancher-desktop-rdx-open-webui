@@ -20,7 +20,7 @@ window.__ddMuiV6Themes = {
     palette: {
       mode: "light",
       background: {
-        default: "#A03232",
+        default: "#f5f6fa",
       },
     }
   })
