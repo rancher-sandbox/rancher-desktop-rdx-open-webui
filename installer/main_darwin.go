@@ -79,8 +79,7 @@ func installOllama(ctx context.Context, release, installPath string) (string, er
 
 	log.Printf("Downloading ollama from %s...", assetURL)
 
-	// For Linux, Ollama is an archive that we need to extract.
-	//TODO: Support ROCm
+	// For macOS, Ollama is an archive that we need to extract.
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, assetURL, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %w", err)
