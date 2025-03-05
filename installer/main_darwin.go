@@ -1,6 +1,8 @@
 package main
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"context"
 	"errors"
 	"fmt"
@@ -25,7 +27,7 @@ func findExecutable(ctx context.Context, defaultOnly bool) string {
 	var potentialLocations []string
 
 	if installLocation, err := getDefaultInstallLocation(ctx); err == nil {
-		potentialLocations = append(potentialLocations, installLocation)
+		potentialLocations = append(potentialLocations, filepath.Join(installLocation, "ollama"))
 	}
 
 	if !defaultOnly {
@@ -49,36 +51,35 @@ func findExecutable(ctx context.Context, defaultOnly bool) string {
 	return ""
 }
 
-func installOllama(ctx context.Context, release, executablePath string) (string, error) {
+func installOllama(ctx context.Context, release, installPath string) (string, error) {
+	succeeded := false
+	executablePath := filepath.Join(installPath, "ollama")
+
 	if _, err := os.Stat(executablePath); err == nil {
 		return executablePath, nil
 	} else if !errors.Is(err, os.ErrNotExist) {
 		return "", fmt.Errorf("failed to check ollama executable: %w", err)
 	}
 
-	assetURL, err := getReleaseAssetURL(ctx, release, "ollama-darwin")
+	defer func() {
+		if !succeeded {
+			// On failure, remove partially extracted files.
+			_ = os.RemoveAll(installPath)
+		}
+	}()
+
+	if err := os.MkdirAll(installPath, 0o755); err != nil {
+		return "", fmt.Errorf("failed to create ollama directory: %w", err)
+	}
+
+	assetURL, err := getReleaseAssetURL(ctx, release, "ollama-darwin.tgz")
 	if err != nil {
 		return "", err
 	}
 
 	log.Printf("Downloading ollama from %s...", assetURL)
 
-	// For darwin, Ollama is a single executable.
-	if err = os.MkdirAll(filepath.Dir(executablePath), 0o755); err != nil {
-		return "", fmt.Errorf("failed to create ollama directory: %w", err)
-	}
-	file, err := os.OpenFile(executablePath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o755)
-	if err != nil {
-		return "", fmt.Errorf("failed to create executable: %w", err)
-	}
-	defer file.Close()
-	succeeded := false
-	defer func() {
-		if !succeeded {
-			os.Remove(executablePath)
-		}
-	}()
-
+	// For macOS, Ollama is an archive that we need to extract.
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, assetURL, nil)
 	if err != nil {
 		return "", fmt.Errorf("failed to create request: %w", err)
@@ -87,22 +88,75 @@ func installOllama(ctx context.Context, release, executablePath string) (string,
 	if err != nil {
 		return "", fmt.Errorf("failed to download ollama: %w", err)
 	}
-	defer resp.Body.Close()
 	if resp.StatusCode >= 300 {
 		return "", fmt.Errorf("error downloading ollama: status %s", resp.Status)
 	}
-	length, err := io.Copy(file, resp.Body)
+	defer resp.Body.Close()
+
+	gzipReader, err := gzip.NewReader(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("failed to write ollama: %w", err)
+		return "", fmt.Errorf("failed to read gzip archive: %w", err)
 	}
-	if resp.ContentLength > 0 {
-		if length < resp.ContentLength {
-			return "", fmt.Errorf("partial read downloading ollama")
+	tarReader := tar.NewReader(gzipReader)
+	var links []tar.Header
+	for {
+		header, err := tarReader.Next()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return "", fmt.Errorf("error reading tar archive: %w", err)
+		}
+		if !filepath.IsLocal(header.Name) {
+			return "", fmt.Errorf("error extracting archive: path %s: %w", header.Name, tar.ErrInsecurePath)
+		}
+		outPath := filepath.Join(installPath, header.Name)
+		info := header.FileInfo()
+		switch header.Typeflag {
+		case tar.TypeDir:
+			if err = os.MkdirAll(outPath, info.Mode()); err != nil {
+				return "", fmt.Errorf("error extracting %s: failed to make directory: %w", header.Name, err)
+			}
+			if err = os.Chmod(outPath, header.FileInfo().Mode()); err != nil {
+				return "", fmt.Errorf("error extracting %s: failed to change permissions: %w", header.Name, err)
+			}
+		case tar.TypeReg:
+			file, err := os.OpenFile(outPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, info.Mode())
+			if err != nil {
+				return "", fmt.Errorf("error extracting %s: failed to create file: %w", header.Name, err)
+			}
+			n, err := io.Copy(file, tarReader)
+			file.Close()
+			if err != nil {
+				return "", fmt.Errorf("error extracting %s: failed to copy: %w", header.Name, err)
+			}
+			if n < header.Size {
+				return "", fmt.Errorf("error extracting %s: extracted %d of %d bytes", header.Name, n, header.Size)
+			}
+		case tar.TypeLink, tar.TypeSymlink:
+			// defer hard & symlink creation until the files exist; note we copy here.
+			if !filepath.IsLocal(header.Linkname) {
+				return "", fmt.Errorf("error extracting %s: %w", header.Name, tar.ErrInsecurePath)
+			}
+			links = append(links, *header)
+		default:
+			return "", fmt.Errorf("error extracting %s: don't know how to handle %v", header.Name, header.Typeflag)
 		}
 	}
-	if err = file.Chmod(0o755); err != nil {
-		return "", fmt.Errorf("failed to change ollama file mode: %w", err)
+
+	for _, link := range links {
+		newName := filepath.Join(installPath, link.Name)
+		oldName := filepath.Join(installPath, link.Linkname)
+		if link.Typeflag == tar.TypeLink {
+			err = os.Link(oldName, newName)
+		} else {
+			err = os.Symlink(oldName, newName)
+		}
+		if err != nil {
+			return "", fmt.Errorf("error extracting %s: could not create link: %w", link.Name, err)
+		}
 	}
+
 	succeeded = true
 
 	return executablePath, nil
@@ -116,7 +170,7 @@ func uninstallOllama(ctx context.Context) error {
 	if err = terminateProcess(ctx, installPath); err != nil {
 		return fmt.Errorf("error terminating existing ollama process: %w", err)
 	}
-	err = os.Remove(installPath)
+	err = os.RemoveAll(installPath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
