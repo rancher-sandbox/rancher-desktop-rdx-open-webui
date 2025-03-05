@@ -27,7 +27,7 @@ func findExecutable(ctx context.Context, defaultOnly bool) string {
 	var potentialLocations []string
 
 	if installLocation, err := getDefaultInstallLocation(ctx); err == nil {
-		potentialLocations = append(potentialLocations, installLocation)
+		potentialLocations = append(potentialLocations, filepath.Join(installLocation, "ollama"))
 	}
 
 	if !defaultOnly {
@@ -68,7 +68,7 @@ func installOllama(ctx context.Context, release, installPath string) (string, er
 		}
 	}()
 
-	if err = os.MkdirAll(filepath.Dir(executablePath), 0o755); err != nil {
+	if err := os.MkdirAll(installPath, 0o755); err != nil {
 		return "", fmt.Errorf("failed to create ollama directory: %w", err)
 	}
 
