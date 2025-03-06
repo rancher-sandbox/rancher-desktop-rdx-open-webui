@@ -55,6 +55,10 @@ func installOllama(ctx context.Context, release, installPath string) (string, er
 		}
 	}()
 
+	if err := os.MkdirAll(installPath, 0o755); err != nil {
+		return "", fmt.Errorf("failed to create ollama directory: %w", err)
+	}
+
 	filename := "ollama-linux-amd64.tgz"
 	if runtime.GOARCH == "arm64" {
 		filename = "ollama-linux-arm64.tgz"
@@ -109,6 +113,9 @@ func installOllama(ctx context.Context, release, installPath string) (string, er
 				return "", fmt.Errorf("error extracting %s: failed to change permissions: %w", header.Name, err)
 			}
 		case tar.TypeReg:
+			if err = os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
+				return "", fmt.Errorf("error extracting %s: failed to make directory: %w", header.Name, err)
+			}
 			file, err := os.OpenFile(outPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, info.Mode())
 			if err != nil {
 				return "", fmt.Errorf("error extracting %s: failed to create file: %w", header.Name, err)
