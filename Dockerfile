@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine AS builder
+FROM golang:1.23-alpine AS builder
 ARG COSMO_VERSION=3.9.2
 ENV CGO_ENABLED=0
 # Install necessary tools
