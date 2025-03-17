@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine AS builder
+FROM golang:1.23-alpine AS builder
 ARG COSMO_VERSION=3.9.2
 ENV CGO_ENABLED=0
 # Install necessary tools
@@ -39,7 +39,7 @@ LABEL org.opencontainers.image.title="Open WebUI" \
     org.opencontainers.image.vendor="SUSE LLC" \
     com.docker.desktop.extension.api.version="0.3.4" \
     com.docker.extension.screenshots="" \
-    com.docker.desktop.extension.icon="https://raw.githubusercontent.com/rancher-sandbox/rancher-desktop-rdx-open-webui/refs/tags/v0.0.6/open-webui.svg" \
+    com.docker.desktop.extension.icon="https://raw.githubusercontent.com/rancher-sandbox/rancher-desktop-rdx-open-webui/refs/tags/v0.0.4/open-webui.svg" \
     com.docker.extension.detailed-description="" \
     com.docker.extension.publisher-url="" \
     com.docker.extension.additional-urls="" \
