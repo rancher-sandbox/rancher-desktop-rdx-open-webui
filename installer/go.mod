@@ -1,6 +1,6 @@
 module github.com/rancher-sandbox/rd-open-webui-docker-ext/installer
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/xenking/zipstream v1.0.1
