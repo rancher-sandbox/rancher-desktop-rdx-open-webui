@@ -1,5 +1,4 @@
-FROM golang:1.23-alpine AS builder
-ARG COSMO_VERSION=3.9.2
+FROM golang:1.24-alpine AS builder
 ENV CGO_ENABLED=0
 # Install necessary tools
 RUN apk update && \
