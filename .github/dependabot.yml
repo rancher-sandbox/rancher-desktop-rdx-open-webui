@@ -11,6 +11,13 @@ updates:
   schedule:
     interval: "daily"
   open-pull-requests-limit: 12
+  ignore:
+  - # @docker/docker-mui-theme only supports max react 18.x.x
+    dependency-name: "react"
+    versions: [">=19.0.0"]
+  - # @docker/docker-mui-theme only supports max react 18.x.x
+    dependency-name: "react-dom"
+    versions: [">=19.0.0"]
 
 - package-ecosystem: "gomod"
   directory: "/installer"
