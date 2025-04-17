@@ -18,6 +18,9 @@ updates:
   - # @docker/docker-mui-theme only supports max react 18.x.x
     dependency-name: "react-dom"
     versions: [">=19.0.0"]
+  - # @docker/docker-mui-theme only supports max @mui/material 6.x.x
+    dependency-name: "@mui/material"
+    versions: [">=7.0.0"]
 
 - package-ecosystem: "gomod"
   directory: "/installer"
