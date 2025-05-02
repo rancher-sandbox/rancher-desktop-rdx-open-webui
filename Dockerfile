@@ -55,3 +55,5 @@ COPY --from=builder /installer/bin/installer-windows.exe /windows/installer.exe
 COPY /searxng/limiter.toml /linux/searxng/limiter.toml
 COPY /searxng/settings.yml /linux/searxng/settings.yml
 COPY /searxng/uwsgi.ini /linux/searxng/uwsgi.ini
+COPY /mcpo/config.json /linux/mcpo/config.json
+COPY /mcpo/entrypoint.sh /linux/mcpo/entrypoint.sh
