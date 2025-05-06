@@ -7,12 +7,13 @@ services:
       - ./linux/searxng:/etc/searxng
     restart: always
   open-webui:
-    image: ghcr.io/open-webui/open-webui@sha256:fe7a6870ec6b2fd540c0f2007e6aa812dc4bf04a2d0a305bb344eeb10de0a7b7  # v0.6.5
+    image: ghcr.io/open-webui/open-webui@sha256:10b848f770b21fb401cb61142772b2767043a001a9c57de550eb9760bbc3db84  # v0.6.6
     ports:
       - "11500:8080"
     volumes:
       - open-webui:/app/backend/data
     environment:
+      - DEFAULT_USER_ROLE=user
       - WEBUI_AUTH=False
       - WEBUI_SESSION_COOKIE_SAME_SITE=None
       - WEBUI_SESSION_COOKIE_SECURE=True
