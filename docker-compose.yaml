@@ -2,14 +2,24 @@ services:
   searxng:
     image: searxng/searxng:latest
     ports:
-      - "11505:8080"
+      - "127.0.0.1:11505:8080"
     volumes:
       - ./linux/searxng:/etc/searxng
+    restart: always
+  mcpo:
+    image: ghcr.io/open-webui/mcpo:main
+    ports:
+      - "127.0.0.1:11600:8000"
+    volumes:
+      - ./linux/mcpo:/etc/mcpo
+      - /etc/rancher/k3s:/etc/rancher/k3s
+      - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: ["/bin/sh", "/etc/mcpo/entrypoint.sh"]
     restart: always
   open-webui:
     image: ghcr.io/open-webui/open-webui@sha256:dc89eb6b7666bfc4d2759e14e228f98aa338b631f3a56e465d315165f6c232c6  # v0.6.7
     ports:
-      - "11500:8080"
+      - "127.0.0.1:11500:8080"
     volumes:
       - open-webui:/app/backend/data
     environment:

@@ -30,6 +30,12 @@
           },
           {
             "path": "/linux/searxng/uwsgi.ini"
+          },
+          {
+            "path": "/linux/mcpo/config.json"
+          },
+          {
+            "path": "/linux/mcpo/entrypoint.sh"
           }
         ],
         "windows": [
