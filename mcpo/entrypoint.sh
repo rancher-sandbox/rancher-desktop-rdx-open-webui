@@ -15,36 +15,40 @@ esac
 
 echo "Detected architecture tag: $ARCH_TAG"
 
-# Install Docker CLI
-echo "Installing Docker CLI..."
-curl -sSL "https://github.com/rancher-sandbox/rancher-desktop-docker-cli/releases/download/v28.1.1/docker-linux-${ARCH_TAG}" -o /usr/local/bin/docker
-chmod +x /usr/local/bin/docker
-echo "Docker CLI installed."
+if [ -e "/var/run/docker.sock" ]; then
+  # Install Docker CLI
+  echo "Installing Docker CLI..."
+  curl -sSL "https://github.com/rancher-sandbox/rancher-desktop-docker-cli/releases/download/v28.1.1/docker-linux-${ARCH_TAG}" -o /usr/local/bin/docker
+  chmod +x /usr/local/bin/docker
+  echo "Docker CLI installed."
 
-# Install Docker Compose
-echo "Installing Docker Compose..."
-curl -sSL "https://github.com/docker/compose/releases/download/v2.18.0/docker-compose-linux-${ARCH_TAG}" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
-echo "Docker Compose installed."
+  # Install Docker Compose
+  echo "Installing Docker Compose..."
+  curl -sSL "https://github.com/docker/compose/releases/download/v2.18.0/docker-compose-linux-${ARCH_TAG}" -o /usr/local/bin/docker-compose
+  chmod +x /usr/local/bin/docker-compose
+  echo "Docker Compose installed."
+fi
 
-# Install kubectl
-echo "Installing kubectl..."
-curl -sSL "https://dl.k8s.io/release/v1.33.0/bin/linux/${ARCH_TAG}/kubectl" -o /usr/local/bin/kubectl
-chmod +x /usr/local/bin/kubectl
-echo "kubectl installed."
+if [ -e "/etc/rancher/k3s/k3s.yaml" ]; then
+  # Install kubectl
+  echo "Installing kubectl..."
+  curl -sSL "https://dl.k8s.io/release/v1.33.0/bin/linux/${ARCH_TAG}/kubectl" -o /usr/local/bin/kubectl
+  chmod +x /usr/local/bin/kubectl
+  echo "kubectl installed."
 
-mkdir -p ~/.kube
-cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-sed -i 's/127.0.0.1/host.docker.internal/g' ~/.kube/config
+  mkdir -p ~/.kube
+  cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+  sed -i 's/127.0.0.1/host.docker.internal/g' ~/.kube/config
 
-# Install Helm
-echo "Installing Helm..."
-curl -sSL "https://get.helm.sh/helm-v3.17.3-linux-${ARCH_TAG}.tar.gz" -o /tmp/helm.tar.gz
-tar -xzvf /tmp/helm.tar.gz -C /tmp
-mv /tmp/linux-${ARCH_TAG}/helm /usr/local/bin/helm
-chmod +x /usr/local/bin/helm
-rm -rf /tmp/helm.tar.gz /tmp/linux-${ARCH_TAG}
-echo "Helm installed."
+  # Install Helm
+  echo "Installing Helm..."
+  curl -sSL "https://get.helm.sh/helm-v3.17.3-linux-${ARCH_TAG}.tar.gz" -o /tmp/helm.tar.gz
+  tar -xzvf /tmp/helm.tar.gz -C /tmp
+  mv /tmp/linux-${ARCH_TAG}/helm /usr/local/bin/helm
+  chmod +x /usr/local/bin/helm
+  rm -rf /tmp/helm.tar.gz /tmp/linux-${ARCH_TAG}
+  echo "Helm installed."
+fi
 
 # Start mcpo
 echo "Starting mcpo..."
