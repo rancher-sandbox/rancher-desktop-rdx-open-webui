@@ -2,14 +2,14 @@ services:
   searxng:
     image: searxng/searxng:latest
     ports:
-      - "11505:8080"
+      - "127.0.0.1:11505:8080"
     volumes:
       - ./linux/searxng:/etc/searxng
     restart: always
   mcpo:
     image: ghcr.io/open-webui/mcpo:main
     ports:
-      - "11600:8000"
+      - "127.0.0.1:11600:8000"
     volumes:
       - ./linux/mcpo:/etc/mcpo
       - /etc/rancher/k3s:/etc/rancher/k3s
@@ -19,7 +19,7 @@ services:
   open-webui:
     image: ghcr.io/open-webui/open-webui@sha256:fe7a6870ec6b2fd540c0f2007e6aa812dc4bf04a2d0a305bb344eeb10de0a7b7  # v0.6.5
     ports:
-      - "11500:8080"
+      - "127.0.0.1:11500:8080"
     volumes:
       - open-webui:/app/backend/data
     environment:
