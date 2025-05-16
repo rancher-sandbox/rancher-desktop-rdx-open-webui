@@ -17,7 +17,7 @@ services:
     entrypoint: ["/bin/sh", "/etc/mcpo/entrypoint.sh"]
     restart: always
   open-webui:
-    image: ghcr.io/open-webui/open-webui@sha256:dc89eb6b7666bfc4d2759e14e228f98aa338b631f3a56e465d315165f6c232c6  # v0.6.7
+    image: ghcr.io/open-webui/open-webui@sha256:2b1758ce5e4874c69baa1a91c6ff8dfc185c9f59eeb52f3a897f85276fc70de7  # v0.6.9
     ports:
       - "127.0.0.1:11500:8080"
     volumes:
@@ -27,9 +27,9 @@ services:
       - WEBUI_AUTH=False
       - WEBUI_SESSION_COOKIE_SAME_SITE=None
       - WEBUI_SESSION_COOKIE_SECURE=True
-      - ENABLE_RAG_WEB_SEARCH=True
+      - ENABLE_WEB_SEARCH=True
+      - WEB_SEARCH_ENGINE=searxng
       - ENABLE_EVALUATION_ARENA_MODELS=False
-      - RAG_WEB_SEARCH_ENGINE=searxng
       - DEFAULT_MODELS=tinyllama
       - SEARXNG_QUERY_URL=http://host.docker.internal:11505
     restart: always
