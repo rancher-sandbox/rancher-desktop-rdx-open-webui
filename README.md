@@ -26,3 +26,7 @@ rdctl extension uninstall <extension-container-image>
 ```
 docker build -t <extension-container-image> .
 ```
+
+## Documentation
+
+To learn more about the extension and how to use it, refer to the [documentation](https://docs.rancherdesktop.io/tutorials/working-with-llms)
