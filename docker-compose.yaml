@@ -17,7 +17,7 @@ services:
     entrypoint: ["/bin/sh", "/etc/mcpo/entrypoint.sh"]
     restart: always
   open-webui:
-    image: ghcr.io/open-webui/open-webui@sha256:2b1758ce5e4874c69baa1a91c6ff8dfc185c9f59eeb52f3a897f85276fc70de7  # v0.6.9
+    image: ghcr.io/open-webui/open-webui@sha256:fda936056184035a71a9ad5ff3721530ff061f16bc3907efb33a3201ba87ccfe  # v0.6.15
     ports:
       - "127.0.0.1:11500:8080"
     volumes:
