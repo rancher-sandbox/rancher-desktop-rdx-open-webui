@@ -17,7 +17,7 @@ jobs:
         case "$ref" in
           refs/heads/main)
             echo "$prefix:latest" >> "$GITHUB_OUTPUT";;
-          refs/tags/v[0-9]*)
+          refs/tags/[0-9]*)
             echo "$prefix:${ref#refs/tags/}" >> "$GITHUB_OUTPUT";;
           *)
             echo "$prefix:${{ github.sha }}" >> "$GITHUB_OUTPUT";;
