@@ -1,6 +1,7 @@
 services:
   searxng:
     image: searxng/searxng:latest
+    pull_policy: always
     ports:
       - "127.0.0.1:11505:8080"
     volumes:
@@ -8,6 +9,7 @@ services:
     restart: always
   mcpo:
     image: ghcr.io/open-webui/mcpo:main
+    pull_policy: always
     ports:
       - "127.0.0.1:11600:8000"
     volumes:
@@ -17,7 +19,8 @@ services:
     entrypoint: ["/bin/sh", "/etc/mcpo/entrypoint.sh"]
     restart: always
   open-webui:
-    image: ghcr.io/open-webui/open-webui@sha256:fda936056184035a71a9ad5ff3721530ff061f16bc3907efb33a3201ba87ccfe  # v0.6.15
+    image: ghcr.io/open-webui/open-webui:latest
+    pull_policy: always
     ports:
       - "127.0.0.1:11500:8080"
     volumes:

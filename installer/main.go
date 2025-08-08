@@ -33,7 +33,7 @@ const (
 var (
 	mode           = ModeInstall
 	allModes       = []Mode{ModeInstall, ModeUninstall, ModeCheck, ModeStart, ModeShutdown}
-	releaseVersion = flag.String("release", "v0.9.2", "release to download when installing")
+	releaseVersion = flag.String("release", "latest", "release to download when installing")
 	pullModel      = flag.String("model", "tinyllama", "model to pull on install; set to empty string to skip")
 )
 
