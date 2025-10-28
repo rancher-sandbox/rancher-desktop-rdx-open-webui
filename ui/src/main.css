@@ -1,7 +1,42 @@
+:root {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    color-scheme: dark light;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body, #root {
+    height: 100%;
+}
+
 body {
-    /* Center everything */
+    margin: 0;
+    background: var(--rdx-root-bg);
+    color: var(--rdx-text-primary);
+}
+
+@media (prefers-color-scheme: light) {
+    body {
+        background: var(--rdx-root-bg);
+    }
+}
+
+#root {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    min-height: 100%;
+}
+
+button {
+    font: inherit;
+}
+
+a {
+    color: inherit;
+}
+
+.error {
+    padding: 2rem;
+    color: #ff8a8a;
 }

@@ -1,0 +1,29 @@
+.rdx-iframe {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+  width: 100%;
+  background: transparent;
+}
+
+.rdx-iframe iframe {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  transition: opacity 0.4s ease;
+}
+
+.rdx-iframe__overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--rdx-overlay-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  pointer-events: none;
+}
