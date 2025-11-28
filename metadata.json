@@ -36,6 +36,9 @@
           },
           {
             "path": "/linux/mcpo/entrypoint.sh"
+          },
+          {
+            "path": "/linux/nginx/nginx.conf"
           }
         ],
         "windows": [

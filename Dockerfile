@@ -57,3 +57,4 @@ COPY /searxng/settings.yml /linux/searxng/settings.yml
 COPY /searxng/uwsgi.ini /linux/searxng/uwsgi.ini
 COPY /mcpo/config.json /linux/mcpo/config.json
 COPY /mcpo/entrypoint.sh /linux/mcpo/entrypoint.sh
+COPY /nginx/nginx.conf /linux/nginx/nginx.conf
