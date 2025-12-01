@@ -658,7 +658,8 @@ async function startLlamaEdgeContainerFromRow(row: RowItem): Promise<{ id: strin
     return runLlamaEdgeContainer(row.name);
   }
   await dockerCli('start', [row.id]);
-  const port = row.port ?? (typeof row.extra?.Ports === 'string' ? extractPort(row.extra.Ports) : undefined);
+  const resolvedPort = await resolveLlamaEdgePort(row.id);
+  const port = resolvedPort ?? row.port ?? (typeof row.extra?.Ports === 'string' ? extractPort(row.extra.Ports) : undefined);
   const token = getOpenWebUIToken();
   if (token && port) {
     await ensureLlamaEdgeConnection(port);
@@ -755,6 +756,17 @@ async function allocateLlamaEdgePort(): Promise<number> {
     }
   }
   throw new Error('Unable to allocate a LlamaEdge port above 11900');
+}
+
+async function resolveLlamaEdgePort(id: string): Promise<number | undefined> {
+  try {
+    const stdout = await dockerCli('port', [id, '8080/tcp']);
+    const match = stdout.match(/:(\d+)/);
+    return match ? Number(match[1]) : undefined;
+  } catch (error) {
+    console.debug('[LlamaEdge] Failed to resolve container port', error);
+    return undefined;
+  }
 }
 
 async function runLlamaEdgeContainer(image: string) {
