@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { createDockerDesktopClient } from '@docker/extension-api-client';
+import { toast } from 'react-toastify';
 import WebpageFrame from './WebpageFrame';
 import InstallView from './InstallView';
 import LoadingView from './LoadingView';
@@ -11,6 +12,15 @@ import McpCatalogModule from './McpCatalogModule';
 import McpConfigurationModule from './McpConfigurationModule';
 import SettingsModule from './SettingsModule';
 import ModelsModule from './ModelsModule';
+import { syncMcpoWithOpenWebui } from './mcpoSync';
+import {
+  fetchComposeDetails,
+  normalizeConfigText,
+  readConfigFromHost,
+  readStoredMcpoConfig,
+  restartMcpoService,
+  writeConfigToHost,
+} from './mcpoConfig';
 
 const ddClient = createDockerDesktopClient();
 
@@ -205,6 +215,46 @@ export function App() {
     if (!started) {
       setActiveModule('models');
     }
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) {
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const cached = readStoredMcpoConfig();
+        const normalizedCached = cached ? normalizeConfigText(cached) : '';
+        const details = await fetchComposeDetails();
+        if (cancelled) {
+          return;
+        }
+        const current = await readConfigFromHost(details.configDir);
+        if (cancelled) {
+          return;
+        }
+        const normalizedCurrent = normalizeConfigText(current);
+        let finalConfig = current;
+        if (cached && normalizedCached && normalizedCached !== normalizedCurrent) {
+          await writeConfigToHost(details.configDir, cached);
+          if (cancelled) {
+            return;
+          }
+          await restartMcpoService(details.projectName, details.composeFile);
+          finalConfig = cached;
+        }
+        if (cancelled) {
+          return;
+        }
+        await syncMcpoWithOpenWebui(finalConfig);
+      } catch (error) {
+        console.error('[mcp-config] Failed to sync configuration on startup', error);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [started]);
 
   const moduleMap = useMemo<Record<ModuleId, JSX.Element>>(

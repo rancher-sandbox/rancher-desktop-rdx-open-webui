@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { toast } from 'react-toastify';
-import { readStoredOpenWebUIToken, writeStoredOpenWebUIToken } from './ModelsModule';
+import { readStoredOpenWebUIToken, writeStoredOpenWebUIToken } from './openWebuiHelpers';
 import './ModuleContent.css';
 import './SettingsModule.css';
 

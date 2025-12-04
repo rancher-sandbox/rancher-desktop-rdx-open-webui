@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createDockerDesktopClient } from '@docker/extension-api-client';
 import { toast } from 'react-toastify';
+import {
+  getOpenWebUIToken,
+  reportOpenWebUIDebug
+} from './openWebuiHelpers';
 import './ModuleContent.css';
 import './ModelsModule.css';
 
@@ -111,10 +115,8 @@ async function fetchWithFallback(urls: string[], init?: RequestInit) {
   throw new Error(`Unable to reach service at ${urls.join(', ')}`);
 }
 
-const OPEN_WEBUI_CONFIG_URL = 'http://localhost:12000/api/openai/config';
-const OPEN_WEBUI_CONFIG_UPDATE_URL = 'http://localhost:12000/api/openai/config/update';
 const LLAMAEDGE_CONNECTION_BASE = 'http://host.docker.internal';
-export const OPEN_WEBUI_TOKEN_STORAGE_KEY = 'rdx.open-webui-token';
+export { OPEN_WEBUI_TOKEN_STORAGE_KEY } from './openWebuiHelpers';
 const DEFAULT_LLAMAEDGE_IMAGES = [
   'matamagu/qwen2-0.5b-instruct:0.1.0',
   'matamagu/deepseek-r1-distill-qwen-7b:0.1.0',
@@ -123,97 +125,8 @@ const DEFAULT_LLAMAEDGE_IMAGES = [
 ];
 const DEFAULT_LLAMAEDGE_IMAGE_SET = new Set(DEFAULT_LLAMAEDGE_IMAGES);
 
-const reportedDebugMessages = new Set<string>();
-
-function reportOpenWebUIDebug(message: string) {
-  const id = `openwebui-debug-${message}`;
-  if (reportedDebugMessages.has(id)) {
-    return;
-  }
-  reportedDebugMessages.add(id);
-  toast.info(message, { toastId: id, autoClose: 15000 });
-}
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-export function readStoredOpenWebUIToken(): string | null {
-  if (typeof window === 'undefined' || !window.localStorage) {
-    return null;
-  }
-  try {
-    return window.localStorage.getItem(OPEN_WEBUI_TOKEN_STORAGE_KEY);
-  } catch {
-    return null;
-  }
-}
-
-export function writeStoredOpenWebUIToken(token: string | null) {
-  if (typeof window === 'undefined' || !window.localStorage) {
-    return;
-  }
-  try {
-    if (!token) {
-      window.localStorage.removeItem(OPEN_WEBUI_TOKEN_STORAGE_KEY);
-    } else {
-      window.localStorage.setItem(OPEN_WEBUI_TOKEN_STORAGE_KEY, token);
-    }
-  } catch (error) {
-    reportOpenWebUIDebug(
-      `Failed to persist token override: ${error instanceof Error ? error.message : String(error)}`,
-    );
-  }
-}
-
-export function getOpenWebUIToken(): string | null {
-  if (typeof window === 'undefined' || !window.localStorage) {
-    return null;
-  }
-  const stored = readStoredOpenWebUIToken();
-  if (stored) {
-    return stored;
-  }
-  try {
-    const keys: string[] = [];
-    for (let index = 0; index < window.localStorage.length; index += 1) {
-      const key = window.localStorage.key(index);
-      if (key) {
-        keys.push(key);
-      }
-    }
-  } catch (error) {
-    reportOpenWebUIDebug(`Failed to enumerate localStorage keys: ${error instanceof Error ? error.message : String(error)}`);
-  }
-  try {
-    const raw = window.localStorage.getItem('token');
-    if (!raw) {
-      reportOpenWebUIDebug('Token entry missing from localStorage');
-      return null;
-    }
-    
-    try {
-      const parsed = JSON.parse(raw);
-      if (typeof parsed === 'string') {        
-        return parsed;
-      }
-      if (isRecord(parsed)) {
-        if (typeof parsed.token === 'string') {
-          return parsed.token;
-        }
-        if (typeof parsed.access_token === 'string') {
-          return parsed.access_token;
-        }
-      }
-      return raw;
-    } catch (error) {
-      reportOpenWebUIDebug(`Failed to parse token JSON; using raw string (${error instanceof Error ? error.message : String(error)})`);
-      return raw;
-    }
-  } catch (error) {
-    reportOpenWebUIDebug(`Unexpected error while reading token: ${error instanceof Error ? error.message : String(error)}`);
-    return null;
-  }
 }
 
 interface OpenWebUIConfigEntry {
@@ -281,98 +194,32 @@ function cloneConfigEntry(value: unknown): OpenWebUIConfigEntry {
   return clone;
 }
 
+import {
+  fetchOpenWebuiConfigApi,
+  updateOpenWebuiConfigApi,
+  fetchModels,
+  fetchModelDetails,
+  updateModel,
+  createModel,
+} from './openWebuiApi';
+
 async function fetchOpenWebUIConfig(): Promise<OpenWebUIConfig> {
-  const token = getOpenWebUIToken();
-  if (!token) {
-    throw new Error(
-      'Unable to access Open WebUI config: no auth token configured. Use Settings to provide one.',
-    );
-  }
   try {
-    return await fetchOpenWebUIConfigViaBrowser(token);
+    return await fetchOpenWebuiConfigApi();
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    reportOpenWebUIDebug(`Browser config fetch failed: ${message}`);
+    reportOpenWebUIDebug(`Open WebUI config fetch failed: ${message}`);
     throw (error instanceof Error ? error : new Error(message));
   }
 }
 
 async function saveOpenWebUIConfig(config: OpenWebUIConfig): Promise<void> {
-  const token = getOpenWebUIToken();
-  if (!token) {
-    reportOpenWebUIDebug('No auth token available for config update');
-    throw new Error(
-      'Unable to update Open WebUI config: no auth token configured. Use Settings to provide one.',
-    );
-  }
-  
   try {
-    await saveOpenWebUIConfigViaBrowser(token, config);
+    await updateOpenWebuiConfigApi(config);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    reportOpenWebUIDebug(`Browser config update failed: ${message}`);
+    reportOpenWebUIDebug(`Open WebUI config update failed: ${message}`);
     throw (error instanceof Error ? error : new Error(message));
-  }
-}
-
-async function fetchOpenWebUIConfigViaBrowser(token: string): Promise<OpenWebUIConfig> {
-  let response: Response;
-  try {
-    response = await fetch(OPEN_WEBUI_CONFIG_URL, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to reach Open WebUI at ${OPEN_WEBUI_CONFIG_URL}: ${message}`);
-  }
-  if (!response.ok) {
-    let message = '';
-    try {
-      message = (await response.text()).trim();
-    } catch {
-      message = '';
-    }
-    throw new Error(message || `Open WebUI config request failed (${response.status})`);
-  }
-  let payload: unknown;
-  try {
-    payload = await response.json();
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Open WebUI config is not valid JSON: ${message}`);
-  }
-  if (!isRecord(payload)) {
-    throw new Error('Open WebUI config response is not an object');
-  }
-  return payload as OpenWebUIConfig;
-}
-
-async function saveOpenWebUIConfigViaBrowser(token: string, config: OpenWebUIConfig): Promise<void> {
-  let response: Response;
-  try {
-    response = await fetch(OPEN_WEBUI_CONFIG_UPDATE_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(config),
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to update Open WebUI config: ${message}`);
-  }
-  if (!response.ok) {
-    let message = '';
-    try {
-      message = (await response.text()).trim();
-    } catch {
-      message = '';
-    }
-    throw new Error(message || `Open WebUI config update failed (${response.status})`);
   }
 }
 

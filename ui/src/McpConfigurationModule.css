@@ -1,0 +1,206 @@
+.rdx-config-editor {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-height: 0;
+}
+
+.rdx-config-editor__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: var(--rdx-text-muted);
+  font-size: 0.9rem;
+}
+
+.rdx-config-editor__meta code {
+  background: rgba(15, 27, 36, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.85rem;
+}
+
+.rdx-config-editor__textarea {
+  flex: 1 1 auto;
+  min-height: 280px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 18, 25, 0.85);
+  color: var(--rdx-text-primary);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 0.9rem;
+  padding: 0.85rem;
+  resize: none;
+  line-height: 1.4;
+}
+
+.rdx-config-editor__textarea-wrapper {
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+}
+
+.rdx-config-spinner-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 12px;
+  z-index: 1;
+}
+
+.rdx-config-spinner,
+.rdx-config-placeholder .rdx-config-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #22a05a;
+  animation: rdx-spin 1s linear infinite;
+}
+
+.rdx-config-placeholder .rdx-config-spinner {
+  margin-right: 0.75rem;
+}
+
+@keyframes rdx-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rdx-config-editor__textarea:focus {
+  outline: none;
+  border-color: rgba(31, 156, 240, 0.85);
+  box-shadow: 0 0 0 1px rgba(31, 156, 240, 0.45);
+}
+
+.rdx-config-editor__textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.rdx-config-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.rdx-config-editor__actions button {
+  border-radius: 8px;
+  padding: 0.46rem 1rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(28, 42, 51, 0.16);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--rdx-text-primary);
+  transition: background var(--rdx-transition), color var(--rdx-transition), border-color var(--rdx-transition), box-shadow var(--rdx-transition);
+}
+
+.rdx-config-editor__actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.rdx-config-editor__actions button.rdx-config-editor__button-secondary:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.rdx-config-editor__actions button.rdx-config-editor__button-primary {
+  border: none;
+  background: linear-gradient(135deg, #1f9cf0, #34a6ff);
+  color: #ffffff;
+}
+
+.rdx-config-editor__actions button.rdx-config-editor__button-primary:not(:disabled):hover {
+  filter: brightness(1.05);
+}
+
+.rdx-config-placeholder {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  color: var(--rdx-text-muted);
+  font-size: 0.95rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.rdx-config-error {
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 77, 77, 0.35);
+  background: rgba(255, 77, 77, 0.08);
+  color: #ffb3b3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rdx-config-error button {
+  align-self: flex-start;
+  border-radius: 9999px;
+  padding: 0.4rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: inherit;
+  cursor: pointer;
+}
+
+.rdx-config-error button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (prefers-color-scheme: light) {
+  .rdx-config-editor__textarea {
+    background: #ffffff;
+    border-color: rgba(28, 42, 51, 0.15);
+    color: #0f1a20;
+  }
+
+  .rdx-config-editor__meta code {
+    background: #f4f7fd;
+    border-color: rgba(28, 42, 51, 0.12);
+  }
+
+  .rdx-config-editor__actions button {
+    background: #ffffff;
+    border-color: rgba(28, 42, 51, 0.16);
+    color: #0f1a20;
+  }
+
+  .rdx-config-editor__actions button.rdx-config-editor__button-secondary:not(:disabled):hover {
+    background: rgba(28, 42, 51, 0.08);
+    border-color: rgba(28, 42, 51, 0.22);
+  }
+
+  .rdx-config-placeholder {
+    border-color: rgba(28, 42, 51, 0.2);
+    color: rgba(15, 33, 49, 0.6);
+  }
+
+  .rdx-config-error {
+    color: #991111;
+    background: rgba(255, 109, 109, 0.18);
+    border-color: rgba(255, 109, 109, 0.4);
+  }
+
+  .rdx-config-error button {
+    border-color: rgba(28, 42, 51, 0.2);
+    color: #0f1a20;
+  }
+}

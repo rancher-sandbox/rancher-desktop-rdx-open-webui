@@ -1,13 +1,4 @@
 services:
-  proxy:
-    image: nginx:alpine
-    volumes:
-      - ./linux/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - open-webui
-    ports:
-      - "127.0.0.1:12000:80"
-    restart: always
   searxng:
     image: searxng/searxng:latest
     pull_policy: always
