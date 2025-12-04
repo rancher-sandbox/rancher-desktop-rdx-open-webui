@@ -5,9 +5,12 @@ import './ModuleContent.css';
 import './McpConfigurationModule.css';
 import {
   fetchComposeDetails,
+  maskSensitiveEnvValues,
   readConfigFromHost,
   readStoredMcpoConfig,
   restartMcpoService,
+  SensitiveValueMap,
+  unmaskSensitiveEnvValues,
   writeConfigToHost,
   writeStoredMcpoConfig,
 } from './mcpoConfig';
@@ -19,8 +22,10 @@ export default function McpConfigurationModule() {
   const [error, setError] = useState('');
   const [composeDetails, setComposeDetails] = useState<ComposeDetails | null>(null);
   const initialStoredConfig = useMemo(() => readStoredMcpoConfig() ?? '', []);
-  const [configText, setConfigText] = useState(initialStoredConfig);
-  const [savedText, setSavedText] = useState(initialStoredConfig);
+  const initialMask = useMemo(() => maskSensitiveEnvValues(initialStoredConfig), [initialStoredConfig]);
+  const [configText, setConfigText] = useState(initialMask.maskedText);
+  const [savedText, setSavedText] = useState(initialMask.maskedText);
+  const [maskMap, setMaskMap] = useState<SensitiveValueMap>(initialMask.maskMap);
   const [busy, setBusy] = useState(false);
 
   const hasChanges = configText !== savedText;
@@ -31,9 +36,11 @@ export default function McpConfigurationModule() {
     try {
       const details = await fetchComposeDetails();
       const text = await readConfigFromHost(details.configDir);
+      const { maskedText, maskMap: nextMaskMap } = maskSensitiveEnvValues(text);
       setComposeDetails(details);
-      setConfigText(text);
-      setSavedText(text);
+      setConfigText(maskedText);
+      setSavedText(maskedText);
+      setMaskMap(nextMaskMap);
       writeStoredMcpoConfig(text);
       void syncMcpoWithOpenWebui(text);
     } catch (cause) {
@@ -43,6 +50,7 @@ export default function McpConfigurationModule() {
       setComposeDetails(null);
       setConfigText('');
       setSavedText('');
+      setMaskMap({});
     } finally {
       setLoading(false);
     }
@@ -66,29 +74,30 @@ export default function McpConfigurationModule() {
     if (!composeDetails) {
       return;
     }
+    let actualConfigText: string;
     try {
-      const parsed = JSON.parse(configText);
-      if (!parsed || typeof parsed !== 'object') {
-        throw new Error('Configuration must be a JSON object.');
-      }
+      actualConfigText = unmaskSensitiveEnvValues(configText, maskMap);
     } catch (cause) {
       toast.error(`Invalid JSON: ${cause instanceof Error ? cause.message : cause}`);
       return;
     }
     setBusy(true);
     try {
-      await writeConfigToHost(composeDetails.configDir, configText);
+      await writeConfigToHost(composeDetails.configDir, actualConfigText);
       await restartMcpoService(composeDetails.projectName, composeDetails.composeFile);
-      setSavedText(configText);
-      writeStoredMcpoConfig(configText);
+      const { maskedText, maskMap: nextMaskMap } = maskSensitiveEnvValues(actualConfigText);
+      setConfigText(maskedText);
+      setSavedText(maskedText);
+      setMaskMap(nextMaskMap);
+      writeStoredMcpoConfig(actualConfigText);
       toast.success('mcpo configuration updated and service restarted.');
-      void syncMcpoWithOpenWebui(configText);
+      void syncMcpoWithOpenWebui(actualConfigText);
     } catch (cause) {
       toast.error(`Failed to update configuration: ${formatError(cause)}`);
     } finally {
       setBusy(false);
     }
-  }, [composeDetails, configText]);
+  }, [composeDetails, configText, maskMap]);
 
   return (
     <div className="rdx-module">

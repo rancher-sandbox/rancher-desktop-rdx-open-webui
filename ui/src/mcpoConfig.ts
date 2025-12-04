@@ -9,12 +9,18 @@ const EXTENSION_IMAGE = ddClient.extension.image;
 export const MCPO_BASE_URL = 'http://host.docker.internal:11600';
 
 export const MCPO_CONFIG_STORAGE_KEY = 'rdx.mcpo-config-cache';
+export const MCPO_SENSITIVE_PLACEHOLDER = '*****';
+const SENSITIVE_KEYWORDS = ['key', 'secret', 'pass', 'password'];
 
 export interface ComposeDetails {
   projectName: string;
   composeFile: string;
   configDir: string;
   configPath: string;
+}
+
+export interface SensitiveValueMap {
+  [path: string]: string;
 }
 
 interface McpoServerInfo {
@@ -246,4 +252,90 @@ export function writeStoredMcpoConfig(value: string | null) {
   } catch (error) {
     console.warn('[mcp-config] Failed to persist cached config', error);
   }
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isSensitiveEnvKey(key: string): boolean {
+  const lower = key.toLowerCase();
+  return SENSITIVE_KEYWORDS.some((keyword) => lower.includes(keyword));
+}
+
+function buildEnvPath(serverId: string, envKey: string): string {
+  return `${serverId}::${envKey}`;
+}
+
+export function maskSensitiveEnvValues(text: string): { maskedText: string; maskMap: SensitiveValueMap } {
+  try {
+    const parsed = JSON.parse(text);
+    if (!isPlainObject(parsed)) {
+      return { maskedText: text, maskMap: {} };
+    }
+    if (!isPlainObject(parsed.mcpServers)) {
+      return { maskedText: text, maskMap: {} };
+    }
+    const map: SensitiveValueMap = {};
+    let changed = false;
+    const servers = parsed.mcpServers as Record<string, unknown>;
+    Object.entries(servers).forEach(([serverId, definition]) => {
+      if (!isPlainObject(definition) || !isPlainObject(definition.env)) {
+        return;
+      }
+      const env = definition.env as Record<string, unknown>;
+      Object.entries(env).forEach(([envKey, envValue]) => {
+        if (typeof envValue !== 'string' || !isSensitiveEnvKey(envKey)) {
+          return;
+        }
+        const path = buildEnvPath(serverId, envKey);
+        map[path] = envValue;
+        env[envKey] = MCPO_SENSITIVE_PLACEHOLDER;
+        changed = true;
+      });
+    });
+    if (!changed) {
+      return { maskedText: text, maskMap: {} };
+    }
+    return { maskedText: JSON.stringify(parsed, null, 2), maskMap: map };
+  } catch (error) {
+    console.warn('[mcp-config] Failed to mask sensitive values', error);
+    return { maskedText: text, maskMap: {} };
+  }
+}
+
+export function unmaskSensitiveEnvValues(text: string, map: SensitiveValueMap): string {
+  const parsed = JSON.parse(text);
+  if (!isPlainObject(parsed)) {
+    throw new Error('Configuration must be a JSON object.');
+  }
+  if (!isPlainObject(parsed.mcpServers)) {
+    return text;
+  }
+  const servers = parsed.mcpServers as Record<string, unknown>;
+  let changed = false;
+  Object.entries(servers).forEach(([serverId, definition]) => {
+    if (!isPlainObject(definition) || !isPlainObject(definition.env)) {
+      return;
+    }
+    const env = definition.env as Record<string, unknown>;
+    Object.entries(env).forEach(([envKey, envValue]) => {
+      if (typeof envValue !== 'string' || !isSensitiveEnvKey(envKey)) {
+        return;
+      }
+      if (envValue !== MCPO_SENSITIVE_PLACEHOLDER) {
+        return;
+      }
+      const path = buildEnvPath(serverId, envKey);
+      if (!(path in map)) {
+        return;
+      }
+      env[envKey] = map[path];
+      changed = true;
+    });
+  });
+  if (!changed) {
+    return text;
+  }
+  return JSON.stringify(parsed, null, 2);
 }

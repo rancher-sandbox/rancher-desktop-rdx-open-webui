@@ -25,7 +25,7 @@
 .rdx-config-editor__textarea {
   flex: 1 1 auto;
   min-height: 280px;
-  border-radius: 12px;
+  border-radius: 0;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(10, 18, 25, 0.85);
   color: var(--rdx-text-primary);
@@ -49,7 +49,7 @@
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.35);
-  border-radius: 12px;
+  border-radius: 0;
   z-index: 1;
 }
 
@@ -132,7 +132,7 @@
   align-items: center;
   justify-content: center;
   border: 1px dashed rgba(255, 255, 255, 0.18);
-  border-radius: 12px;
+  border-radius: 0;
   color: var(--rdx-text-muted);
   font-size: 0.95rem;
   padding: 2rem;
@@ -190,6 +190,7 @@
 
   .rdx-config-placeholder {
     border-color: rgba(28, 42, 51, 0.2);
+    border-radius: 0;
     color: rgba(15, 33, 49, 0.6);
   }
 
