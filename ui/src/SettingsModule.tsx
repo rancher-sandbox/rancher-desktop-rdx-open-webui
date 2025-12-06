@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { toast } from 'react-toastify';
 import { readStoredOpenWebUIToken, writeStoredOpenWebUIToken } from './openWebuiHelpers';
+import { ensureOpenAiProxyConnection } from './openAiConnections';
 import {
   CatalogSourceDefinition,
   createCatalogSource,
@@ -70,6 +71,9 @@ export default function SettingsModule() {
     setTokenValue(trimmed);
     setIsMasked(true);
     toast.success('Open WebUI token saved.');
+    ensureOpenAiProxyConnection().catch((error) => {
+      console.error('[settings] Failed to ensure OpenAI proxy connection', error);
+    });
   }, [tokenValue]);
 
   const handleClear = useCallback(() => {
@@ -328,7 +332,7 @@ export default function SettingsModule() {
               </button>
             </div>
             <p className="settings-helper">
-              Registry sources are stored for future releases. The Catalog currently fetches HTTP sources only.
+              Registry sources will be supported in a future release. The Catalog currently fetches DockerHub MCP catalog (HTTP) only.
             </p>
           </div>
         </div>

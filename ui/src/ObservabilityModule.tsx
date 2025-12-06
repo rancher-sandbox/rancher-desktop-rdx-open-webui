@@ -1,11 +1,5 @@
-import './ModuleContent.css';
+import WebpageFrame from './WebpageFrame';
 
 export default function ObservabilityModule() {
-  return (
-    <div className="rdx-module">
-      <header className="rdx-module__header">
-        <h1>Observability</h1>
-      </header>
-    </div>
-  );
+  return <WebpageFrame src="http://localhost:11605/drilldown" title="Observability" />;
 }

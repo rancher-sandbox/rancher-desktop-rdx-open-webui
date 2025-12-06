@@ -33,8 +33,8 @@ COPY ui /ui
 RUN npm run build
 
 FROM alpine
-LABEL org.opencontainers.image.title="Open WebUI" \
-    org.opencontainers.image.description="Open WebUI on Rancher Desktop" \
+LABEL org.opencontainers.image.title="AI Workbench" \
+    org.opencontainers.image.description="AI Workbench extension" \
     org.opencontainers.image.vendor="SUSE LLC" \
     com.docker.desktop.extension.api.version="0.3.4" \
     com.docker.extension.screenshots="" \

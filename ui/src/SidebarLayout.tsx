@@ -25,7 +25,7 @@ export default function SidebarLayout({
   children,
   contentVariant = 'default',
 }: SidebarLayoutProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const categoryIds = useMemo(() => {
     const ids = new Set<string>();

@@ -5,6 +5,13 @@ import {
   getOpenWebUIToken,
   reportOpenWebUIDebug
 } from './openWebuiHelpers';
+import {
+  cloneConfigEntry,
+  isRecord,
+  OpenWebUIConfig,
+  OpenWebUIConfigEntry,
+  toStringArray,
+} from './openAiConfig';
 import './ModuleContent.css';
 import './ModelsModule.css';
 
@@ -85,10 +92,10 @@ const ENGINE_CONFIG: Record<EngineId, {
   llamaedge: {
     label: 'LlamaEdge',
     modalTitle: 'Run LlamaEdge Container',
-    modalDescription: 'Enter a container image that exposes port 8080 inside the container.',
+    modalDescription: 'Enter a LlamaEdge container image name.',
     inputLabel: 'Container image',
     placeholder: 'myrepo/llamaedge-phi4:latest',
-    helperText: 'Image must expose port 8080. A host port in 11900–12000 will be assigned automatically.',
+    helperText: 'Refer to https://llamaedge.com/docs/ai-models/llamaedge-docker to learn how to build your own LlamaEdge contianer image.',
     submitLabel: 'Run',
     emptyMessage: 'No LlamaEdge containers found. Click Download/Run to start one.',
   },
@@ -125,28 +132,6 @@ const DEFAULT_LLAMAEDGE_IMAGES = [
 ];
 const DEFAULT_LLAMAEDGE_IMAGE_SET = new Set(DEFAULT_LLAMAEDGE_IMAGES);
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-interface OpenWebUIConfigEntry {
-  enable?: boolean;
-  tags?: string[];
-  prefix_id?: string;
-  model_ids?: string[];
-  connection_type?: string;
-  auth_type?: string;
-  [key: string]: unknown;
-}
-
-interface OpenWebUIConfig {
-  ENABLE_OPENAI_API?: boolean;
-  OPENAI_API_BASE_URLS?: string[];
-  OPENAI_API_KEYS?: string[];
-  OPENAI_API_CONFIGS?: Record<string, OpenWebUIConfigEntry>;
-  [key: string]: unknown;
-}
-
 const LLAMAEDGE_CONFIG_TEMPLATE: OpenWebUIConfigEntry = {
   enable: true,
   tags: [],
@@ -155,44 +140,6 @@ const LLAMAEDGE_CONFIG_TEMPLATE: OpenWebUIConfigEntry = {
   connection_type: 'external',
   auth_type: 'bearer',
 };
-
-function toStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-  return value.filter((item): item is string => typeof item === 'string');
-}
-
-function cloneConfigEntry(value: unknown): OpenWebUIConfigEntry {
-  if (!isRecord(value)) {
-    return {};
-  }
-  const entry = value as OpenWebUIConfigEntry;
-  const clone: OpenWebUIConfigEntry = { ...entry };
-  if (Array.isArray(entry.tags)) {
-    clone.tags = entry.tags.filter((item): item is string => typeof item === 'string');
-  } else {
-    delete clone.tags;
-  }
-  if (Array.isArray(entry.model_ids)) {
-    clone.model_ids = entry.model_ids.filter((item): item is string => typeof item === 'string');
-  } else {
-    delete clone.model_ids;
-  }
-  if (typeof entry.prefix_id !== 'string') {
-    delete clone.prefix_id;
-  }
-  if (typeof entry.connection_type !== 'string') {
-    delete clone.connection_type;
-  }
-  if (typeof entry.auth_type !== 'string') {
-    delete clone.auth_type;
-  }
-  if (typeof entry.enable !== 'boolean') {
-    delete clone.enable;
-  }
-  return clone;
-}
 
 import {
   fetchOpenWebuiConfigApi,

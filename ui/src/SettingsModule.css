@@ -50,7 +50,7 @@
 }
 
 .settings-description--multiline {
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .settings-helper {

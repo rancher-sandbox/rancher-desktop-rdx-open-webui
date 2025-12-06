@@ -1,4 +1,31 @@
 services:
+  pipelines:
+    image: ghcr.io/open-webui/pipelines:main
+    ports:
+      - "11700:9099"
+    volumes:
+      - open-webui:/app/pipelines
+    environment:
+      - PIPELINES_URLS="https://raw.githubusercontent.com/SUSE/suse-ai-observability-extension/refs/heads/main/integrations/oi-filter/suse_ai_filter.py"
+      - OTEL_EXPORTER_HTTP_OTLP_ENDPOINT=http://host.docker.internal:4318
+      - PRICING_JSON=https://raw.githubusercontent.com/SUSE/suse-ai-observability-extension/refs/heads/main/integrations/oi-filter/pricing.json
+      - OTEL_SERVICE_NAME=open-webui
+    restart: always
+  grafana:
+    image: grafana/otel-lgtm:latest
+    ports:
+      - "11605:3000"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_SECURITY_COOKIE_SAMESITE=None
+      - GF_SERVER_ROOT_URL=http://host.docker.internal:11605
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_USERS_DEFAULT_THEME=system
+    restart: always      
   searxng:
     image: searxng/searxng:latest
     pull_policy: always
@@ -25,10 +52,15 @@ services:
       - "127.0.0.1:11500:8080"
     volumes:
       - open-webui:/app/backend/data
+    depends_on:
+      - grafana
+      - mcpo
+      - pipelines      
     environment:
       - DEFAULT_USER_ROLE=user
       - WEBUI_AUTH=False
       - WEBUI_SECRET_KEY=rd-0i-s3cr3t
+      - OPENAI_API_KEY=0p3n-w3bu!
       - WEBUI_SESSION_COOKIE_SAME_SITE=None
       - WEBUI_SESSION_COOKIE_SECURE=True
       - ENABLE_WEB_SEARCH=True
@@ -38,6 +70,13 @@ services:
       - DEFAULT_MODELS=tinyllama
       - SEARXNG_QUERY_URL=http://host.docker.internal:11505
       - ENABLE_VERSION_UPDATE_CHECK=False
+      - ENABLE_OTEL=true
+      - ENABLE_OTEL_METRICS=true
+      - ENABLE_OTEL_TRACES=true
+      - ENABLE_OTEL_LOGS=true
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://host.docker.internal:4317
+      - OTEL_SERVICE_NAME=open-webui    
     restart: always
 
 volumes:

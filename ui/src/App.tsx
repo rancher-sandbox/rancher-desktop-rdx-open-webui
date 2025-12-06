@@ -21,6 +21,7 @@ import {
   restartMcpoService,
   writeConfigToHost,
 } from './mcpoConfig';
+import { ensureOpenAiProxyConnection } from './openAiConnections';
 
 const ddClient = createDockerDesktopClient();
 
@@ -32,7 +33,7 @@ type ModuleId =
   | 'models'
   | 'settings';
 
-const flushContentModules = new Set<ModuleId>(['playground']);
+const flushContentModules = new Set<ModuleId>(['playground', 'observability']);
 
 const iconColorProps = {
   width: 20,
@@ -102,7 +103,7 @@ const moduleDefinitions: ModuleDefinition[] = [
   {
     id: 'models',
     title: 'Models',
-    description: 'Model inventory',
+    description: 'Pull & Run LLMs',
     icon: icons.models,
   },
   {
@@ -113,13 +114,13 @@ const moduleDefinitions: ModuleDefinition[] = [
       {
         id: 'mcp-catalog',
         title: 'Catalog',
-        description: 'Powered by mcpo',
+        description: 'Discover & Run MCPs',
         icon: icons.catalog,
       },
       {
         id: 'mcp-configuration',
         title: 'Configuration',
-        description: 'Service configuration',
+        description: 'MCP Proxy configuration',
         icon: icons.configuration,
       },
     ],
@@ -127,7 +128,7 @@ const moduleDefinitions: ModuleDefinition[] = [
   {
     id: 'observability',
     title: 'Observability',
-    description: 'Powered by Langfuse',
+    description: 'Powered by OTEL',
     icon: icons.observability,
   },
   {
@@ -255,6 +256,15 @@ export function App() {
     return () => {
       cancelled = true;
     };
+  }, [started]);
+
+  useEffect(() => {
+    if (!started) {
+      return;
+    }
+    ensureOpenAiProxyConnection().catch((error) => {
+      console.error('[openai-config] Failed to ensure OpenAI proxy connection', error);
+    });
   }, [started]);
 
   const moduleMap = useMemo<Record<ModuleId, JSX.Element>>(

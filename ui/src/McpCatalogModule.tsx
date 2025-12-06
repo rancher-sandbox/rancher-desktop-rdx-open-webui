@@ -465,38 +465,44 @@ export default function McpCatalogModule() {
                       <dd>{formatDate(item.lastUpdated)}</dd>
                     </div>
                   </dl>
-                  <div className="catalog-card__categories">
-                    {item.categories.map((category) => (
-                      <span key={category}>{category}</span>
-                    ))}
-                  </div>
-                  <div className="catalog-card__actions">
-                    {isInstalled ? (
-                      <button
-                        type="button"
-                        className="catalog-button catalog-button--danger"
-                        onClick={() => handleRemoveServer(item)}
-                        disabled={configBusy || isRemoving}
+                  <div className="catalog-card__footer">
+                    <div className="catalog-card__actions">
+                      {isInstalled ? (
+                        <button
+                          type="button"
+                          className="catalog-button catalog-button--danger"
+                          onClick={() => handleRemoveServer(item)}
+                          disabled={configBusy || isRemoving}
+                        >
+                          {isRemoving ? (
+                            <>
+                              <span className="catalog-spinner catalog-spinner--inline" aria-hidden="true" />
+                              Removing…
+                            </>
+                          ) : (
+                            'Remove'
+                          )}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="catalog-button catalog-button--primary"
+                          onClick={() => openModal(item)}
+                          disabled={configBusy || !!configError}
+                        >
+                          Run
+                        </button>
+                      )}
+                    </div>
+                    <div className="catalog-card__links">
+                      <a
+                        href={`https://hub.docker.com/r/${item.image}`}
+                        target="_blank"
+                        rel="noreferrer"
                       >
-                        {isRemoving ? (
-                          <>
-                            <span className="catalog-spinner catalog-spinner--inline" aria-hidden="true" />
-                            Removing…
-                          </>
-                        ) : (
-                          'Remove'
-                        )}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="catalog-button catalog-button--primary"
-                        onClick={() => openModal(item)}
-                        disabled={configBusy || !!configError}
-                      >
-                        Run
-                      </button>
-                    )}
+                        Learn more ↗
+                      </a>
+                    </div>
                   </div>
                 </article>
               );
