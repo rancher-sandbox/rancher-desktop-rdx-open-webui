@@ -43,6 +43,7 @@ services:
       - ./linux/mcpo:/etc/mcpo
       - /etc/rancher/k3s:/etc/rancher/k3s
       - /var/run/docker.sock:/var/run/docker.sock
+      - mcpo:/var/lib/rdx-mcpo
     entrypoint: ["/bin/sh", "/etc/mcpo/entrypoint.sh"]
     restart: always
   open-webui:
@@ -81,3 +82,4 @@ services:
 
 volumes:
   open-webui:
+  mcpo:

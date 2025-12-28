@@ -6,6 +6,34 @@
   min-height: 0;
 }
 
+.rdx-config-editor__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: -0.35rem;
+}
+
+.rdx-config-editor__toolbar button {
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 0.95rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: rgba(31, 156, 240, 0.16);
+  color: #57b8ff;
+  cursor: pointer;
+  transition: background var(--rdx-transition), color var(--rdx-transition);
+}
+
+.rdx-config-editor__toolbar button:hover:not(:disabled) {
+  background: rgba(31, 156, 240, 0.26);
+}
+
+.rdx-config-editor__toolbar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .rdx-config-editor__meta {
   display: flex;
   flex-direction: column;
@@ -165,6 +193,229 @@
   cursor: not-allowed;
 }
 
+.mcp-config-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 12, 20, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 50;
+}
+
+.mcp-config-modal__card {
+  width: min(640px, 100%);
+  background: rgba(10, 20, 32, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: var(--rdx-text-primary);
+  max-height: 90vh;
+}
+
+.mcp-config-modal__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.mcp-config-modal__header h2 {
+  margin: 0;
+}
+
+.mcp-config-modal__header p {
+  margin: 0;
+  color: var(--rdx-text-muted);
+}
+
+.mcp-config-modal__type-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.mcp-config-modal__type-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.mcp-config-modal__type-toggle input {
+  accent-color: #1f9cf0;
+}
+
+.mcp-config-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.mcp-config-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mcp-config-modal__field span {
+  font-weight: 600;
+}
+
+.mcp-config-modal__field input,
+.mcp-config-modal__field textarea,
+.mcp-config-modal__spec input[type='url'] {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--rdx-text-primary);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+}
+
+.mcp-config-modal__field textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.mcp-config-modal__helper {
+  font-size: 0.78rem;
+  color: var(--rdx-text-muted);
+}
+
+.mcp-config-modal__list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.mcp-config-modal__list-header button {
+  border: none;
+  border-radius: 8px;
+  padding: 0.35rem 0.85rem;
+  background: rgba(31, 156, 240, 0.2);
+  color: #62bfff;
+  cursor: pointer;
+}
+
+.mcp-config-modal__list-header button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mcp-config-modal__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mcp-config-modal__row {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.mcp-config-modal__row input {
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--rdx-text-primary);
+  padding: 0.45rem 0.6rem;
+}
+
+.mcp-config-modal__row button {
+  border: none;
+  border-radius: 8px;
+  padding: 0.35rem 0.8rem;
+  background: rgba(255, 118, 118, 0.18);
+  color: #ff9d9d;
+  cursor: pointer;
+}
+
+.mcp-config-modal__row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mcp-config-modal__row--args {
+  grid-template-columns: minmax(140px, 1fr) auto;
+}
+
+.mcp-config-modal__row--env {
+  grid-template-columns: repeat(2, minmax(120px, 1fr)) auto;
+}
+
+.mcp-config-modal__empty-row {
+  font-size: 0.85rem;
+  color: var(--rdx-text-muted);
+}
+
+.mcp-config-modal__spec {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mcp-config-modal__spec-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-weight: 600;
+}
+
+.mcp-config-modal__file-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.mcp-config-modal__file-name {
+  font-size: 0.85rem;
+  color: var(--rdx-text-muted);
+}
+
+.mcp-config-modal__error {
+  color: #ff8a8a;
+  font-size: 0.9rem;
+}
+
+.mcp-config-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.mcp-config-modal__footer button {
+  border-radius: 10px;
+  padding: 0.45rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: var(--rdx-text-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mcp-config-modal__footer button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mcp-config-modal__primary {
+  background: linear-gradient(135deg, #1f9cf0, #34a6ff);
+  border: none;
+  color: #ffffff;
+}
+
 @media (prefers-color-scheme: light) {
   .rdx-config-editor__textarea {
     background: #ffffff;
@@ -202,6 +453,41 @@
 
   .rdx-config-error button {
     border-color: rgba(28, 42, 51, 0.2);
+    color: #0f1a20;
+  }
+
+  .rdx-config-editor__toolbar button {
+    background: rgba(31, 156, 240, 0.1);
+    color: #0f1a20;
+  }
+
+  .mcp-config-modal__card {
+    background: #ffffff;
+    border-color: rgba(28, 42, 51, 0.12);
+    color: #0f1a20;
+  }
+
+  .mcp-config-modal__field input,
+  .mcp-config-modal__field textarea,
+  .mcp-config-modal__spec input[type='url'],
+  .mcp-config-modal__row input {
+    background: #f4f7fd;
+    border-color: rgba(28, 42, 51, 0.18);
+    color: #0f1a20;
+  }
+
+  .mcp-config-modal__row button {
+    background: rgba(255, 118, 118, 0.2);
+    color: #a12727;
+  }
+
+  .mcp-config-modal__footer button {
+    border-color: rgba(28, 42, 51, 0.2);
+    color: #0f1a20;
+  }
+
+  .mcp-config-modal__list-header button {
+    background: rgba(31, 156, 240, 0.15);
     color: #0f1a20;
   }
 }

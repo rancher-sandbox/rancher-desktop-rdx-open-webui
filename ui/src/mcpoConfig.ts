@@ -7,6 +7,8 @@ const MCPO_FILE_NAME = 'config.json';
 const MCPO_RELATIVE_PATH = `linux/mcpo/${MCPO_FILE_NAME}`;
 const EXTENSION_IMAGE = ddClient.extension.image;
 export const MCPO_BASE_URL = 'http://host.docker.internal:11600';
+export const MCPO_SPEC_VOLUME_SUFFIX = 'mcpo';
+export const MCPO_PERSISTENT_SPEC_BASE_PATH = '/var/lib/rdx-mcpo';
 
 export const MCPO_CONFIG_STORAGE_KEY = 'rdx.mcpo-config-cache';
 export const MCPO_SENSITIVE_PLACEHOLDER = '*****';
@@ -223,6 +225,66 @@ export async function writeConfigToHost(configDir: string, content: string) {
   ]);
 }
 
+const FILE_WRITE_CHUNK_SIZE = 16 * 1024;
+
+async function writeFileToDockerMount(mountSource: string, relativePath: string, content: string) {
+  if (!mountSource) {
+    throw new Error('Unknown mcpo target.');
+  }
+  const normalizedTarget = normalizeRelativePath(relativePath);
+  const mountArg = `${mountSource}:/rdx-mcpo`;
+  const targetPath = `/rdx-mcpo/${normalizedTarget}`;
+  await runDocker([
+    '--rm',
+    '-v',
+    mountArg,
+    '--entrypoint',
+    'sh',
+    EXTENSION_IMAGE,
+    '-c',
+    [
+      'set -e',
+      `target="${targetPath}"`,
+      'mkdir -p "$(dirname "$target")"',
+      ': >"$target"',
+    ].join(' && '),
+  ]);
+  if (!content) {
+    return;
+  }
+  for (let offset = 0; offset < content.length; offset += FILE_WRITE_CHUNK_SIZE) {
+    const chunk = content.slice(offset, offset + FILE_WRITE_CHUNK_SIZE);
+    const encodedChunk = encodeBase64(chunk);
+    const shellCommand = [
+      'set -e',
+      `target="${targetPath}"`,
+      `printf '%s' '${encodedChunk}' | base64 -d >>"$target"`,
+    ].join(' && ');
+    await runDocker([
+      '--rm',
+      '-v',
+      mountArg,
+      '--entrypoint',
+      'sh',
+      EXTENSION_IMAGE,
+      '-c',
+      shellCommand,
+    ]);
+  }
+}
+
+export async function writeFileToComposeVolume(volumeName: string, relativePath: string, content: string) {
+  await writeFileToDockerMount(volumeName, relativePath, content);
+}
+
+export function buildComposeVolumeName(projectName: string, volumeSuffix: string): string {
+  const trimmedProject = projectName?.trim();
+  if (trimmedProject) {
+    return `${trimmedProject}_${volumeSuffix}`;
+  }
+  return volumeSuffix;
+}
+
 export async function restartMcpoService(projectName: string, composeFile: string) {
   await ddClient.docker.cli.exec('compose', ['-f', composeFile, '-p', projectName, 'restart', 'mcpo']);
 }
@@ -256,6 +318,20 @@ export function writeStoredMcpoConfig(value: string | null) {
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function normalizeRelativePath(path: string): string {
+  const sanitized = path
+    .replace(/\\/g, '/')
+    .replace(/^\/+/, '')
+    .split('/')
+    .map((segment) => segment.trim())
+    .filter((segment) => segment && segment !== '.' && segment !== '..')
+    .join('/');
+  if (!sanitized) {
+    throw new Error('Invalid file path for mcpo directory.');
+  }
+  return sanitized;
 }
 
 function isSensitiveEnvKey(key: string): boolean {

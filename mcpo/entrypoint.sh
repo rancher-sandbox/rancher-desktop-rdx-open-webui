@@ -66,6 +66,9 @@ if [ -e "/etc/rancher/k3s/k3s.yaml" ]; then
   fi
 fi
 
+# Install https://pypi.org/project/mcp-openapi-proxy/
+uvx mcp-openapi-proxy
+
 # Start mcpo
 echo "Starting mcpo..."
 exec mcpo --api-key "" --config /etc/mcpo/config.json
