@@ -4,6 +4,13 @@ import { toast } from 'react-toastify';
 import './ModuleContent.css';
 import './McpConfigurationModule.css';
 import {
+  ArgEnvInputs,
+  ArgRow,
+  EnvRow,
+  createArgRow,
+  createEnvRow,
+} from './ArgEnvInputs';
+import {
   fetchComposeDetails,
   maskSensitiveEnvValues,
   readConfigFromHost,
@@ -24,16 +31,8 @@ import type { ComposeDetails } from './mcpoConfig';
 type ConfigModalType = 'openapi' | 'custom';
 type SpecSourceType = 'url' | 'file';
 
-interface ModalArgRow {
-  id: string;
-  value: string;
-}
-
-interface ModalEnvRow {
-  id: string;
-  key: string;
-  value: string;
-}
+type ModalArgRow = ArgRow;
+type ModalEnvRow = EnvRow;
 
 interface AddServerModalState {
   type: ConfigModalType;
@@ -54,14 +53,6 @@ interface AddServerModalState {
 const OPENAPI_DEFAULT_COMMAND = 'uvx';
 const OPENAPI_DEFAULT_ARG = 'mcp-openapi-proxy';
 const SPEC_STORAGE_DIR = 'openapi-specs';
-
-function createArgRow(value = ''): ModalArgRow {
-  return { id: `arg-${Math.random().toString(36).slice(2, 9)}`, value };
-}
-
-function createEnvRow(): ModalEnvRow {
-  return { id: `env-${Math.random().toString(36).slice(2, 9)}`, key: '', value: '' };
-}
 
 function createAddModalState(type: ConfigModalType): AddServerModalState {
   return {
@@ -229,56 +220,6 @@ export default function McpConfigurationModule() {
         args:
           type === 'openapi' && prev.args.length === 0 ? [createArgRow(OPENAPI_DEFAULT_ARG)] : prev.args,
       };
-    });
-  }, []);
-
-  const addArgRow = useCallback(() => {
-    setAddModalState((prev) => (prev ? { ...prev, args: [...prev.args, createArgRow()] } : prev));
-  }, []);
-
-  const updateArgRow = useCallback((rowId: string, value: string) => {
-    setAddModalState((prev) => {
-      if (!prev) {
-        return prev;
-      }
-      return {
-        ...prev,
-        args: prev.args.map((row) => (row.id === rowId ? { ...row, value } : row)),
-      };
-    });
-  }, []);
-
-  const removeArgRow = useCallback((rowId: string) => {
-    setAddModalState((prev) => {
-      if (!prev) {
-        return prev;
-      }
-      return { ...prev, args: prev.args.filter((row) => row.id !== rowId) };
-    });
-  }, []);
-
-  const addEnvRow = useCallback(() => {
-    setAddModalState((prev) => (prev ? { ...prev, envs: [...prev.envs, createEnvRow()] } : prev));
-  }, []);
-
-  const updateEnvRow = useCallback((rowId: string, field: 'key' | 'value', value: string) => {
-    setAddModalState((prev) => {
-      if (!prev) {
-        return prev;
-      }
-      return {
-        ...prev,
-        envs: prev.envs.map((row) => (row.id === rowId ? { ...row, [field]: value } : row)),
-      };
-    });
-  }, []);
-
-  const removeEnvRow = useCallback((rowId: string) => {
-    setAddModalState((prev) => {
-      if (!prev) {
-        return prev;
-      }
-      return { ...prev, envs: prev.envs.filter((row) => row.id !== rowId) };
     });
   }, []);
 
@@ -539,67 +480,13 @@ export default function McpConfigurationModule() {
                   placeholder="docker"
                 />
               </label>
-              <div>
-                <div className="mcp-config-modal__list-header">
-                  <span>Arguments</span>
-                  <button type="button" onClick={addArgRow} disabled={addModalState.busy}>
-                    Add argument
-                  </button>
-                </div>
-                <div className="mcp-config-modal__list">
-                  {addModalState.args.length === 0 && (
-                    <div className="mcp-config-modal__empty-row">No arguments yet.</div>
-                  )}
-                  {addModalState.args.map((arg) => (
-                    <div key={arg.id} className="mcp-config-modal__row mcp-config-modal__row--args">
-                      <input
-                        type="text"
-                        value={arg.value}
-                        onChange={(event) => updateArgRow(arg.id, event.target.value)}
-                        disabled={addModalState.busy}
-                        placeholder="run"
-                      />
-                      <button type="button" onClick={() => removeArgRow(arg.id)} disabled={addModalState.busy}>
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <div className="mcp-config-modal__list-header">
-                  <span>Environment variables</span>
-                  <button type="button" onClick={addEnvRow} disabled={addModalState.busy}>
-                    Add variable
-                  </button>
-                </div>
-                <div className="mcp-config-modal__list">
-                  {addModalState.envs.length === 0 && (
-                    <div className="mcp-config-modal__empty-row">No environment variables yet.</div>
-                  )}
-                  {addModalState.envs.map((env) => (
-                    <div key={env.id} className="mcp-config-modal__row mcp-config-modal__row--env">
-                      <input
-                        type="text"
-                        value={env.key}
-                        onChange={(event) => updateEnvRow(env.id, 'key', event.target.value)}
-                        disabled={addModalState.busy}
-                        placeholder="API_KEY"
-                      />
-                      <input
-                        type="text"
-                        value={env.value}
-                        onChange={(event) => updateEnvRow(env.id, 'value', event.target.value)}
-                        disabled={addModalState.busy}
-                        placeholder="value"
-                      />
-                      <button type="button" onClick={() => removeEnvRow(env.id)} disabled={addModalState.busy}>
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <ArgEnvInputs
+                args={addModalState.args}
+                envs={addModalState.envs}
+                disabled={addModalState.busy}
+                onChangeArgs={(nextArgs) => updateAddModal({ args: nextArgs })}
+                onChangeEnvs={(nextEnvs) => updateAddModal({ envs: nextEnvs })}
+              />
               {addModalState.type === 'openapi' && (
                 <div className="mcp-config-modal__spec">
                   <div className="mcp-config-modal__list-header">

@@ -310,54 +310,6 @@
   color: var(--rdx-text-muted);
 }
 
-.catalog-modal__env-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.catalog-modal__env-header button {
-  border: none;
-  border-radius: 8px;
-  padding: 0.35rem 0.8rem;
-  background: rgba(31, 156, 240, 0.15);
-  color: #1f9cf0;
-  cursor: pointer;
-}
-
-.catalog-modal__env-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.catalog-modal__env-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(120px, 1fr)) auto;
-  gap: 0.5rem;
-}
-
-.catalog-modal__env-row input {
-  border-radius: 8px;
-  border: 1px solid rgba(28, 42, 51, 0.2);
-  padding: 0.5rem 0.6rem;
-}
-
-.catalog-modal__env-row button {
-  border: none;
-  border-radius: 8px;
-  padding: 0.35rem 0.8rem;
-  background: rgba(255, 99, 99, 0.18);
-  color: #c73636;
-  cursor: pointer;
-}
-
-.catalog-modal__env-empty {
-  font-size: 0.85rem;
-  color: var(--rdx-text-muted);
-}
-
 .catalog-modal__error {
   color: #c73636;
   font-size: 0.88rem;

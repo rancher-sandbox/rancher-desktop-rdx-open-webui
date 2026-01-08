@@ -97,11 +97,12 @@ async function syncModelToolAssignments(serverIds: string[]) {
         : [];
       const preserved = current.filter((id) => !id.startsWith(TOOL_SERVER_PREFIX));
       const merged = [...preserved];
-      desiredToolIds.forEach((toolId) => {
+      // gunamata - commented out adding tools to Model config for now
+/*       desiredToolIds.forEach((toolId) => {
         if (!merged.includes(toolId)) {
           merged.push(toolId);
         }
-      });
+      }); */
       if (!arraysEqual(current, merged)) {
         await upsertModelWithToolIds(model, merged);
       }

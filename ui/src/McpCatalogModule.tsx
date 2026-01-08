@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import './ModuleContent.css';
 import './McpCatalogModule.css';
+import { ArgEnvInputs, EnvRow } from './ArgEnvInputs';
 import {
   CatalogSourceDefinition,
   describeCatalogSource,
@@ -50,17 +51,11 @@ interface DockerHubResponse {
 
 type McpoConfigObject = ReturnType<typeof parseMcpoConfig>;
 
-interface RunModalEnv {
-  id: string;
-  key: string;
-  value: string;
-}
-
 interface RunModalState {
   item: CatalogEntry;
   image: string;
   tag: string;
-  envs: RunModalEnv[];
+  envs: EnvRow[];
   busy: boolean;
   error: string;
 }
@@ -190,37 +185,6 @@ export default function McpCatalogModule() {
     setModalState((prev) => (prev ? { ...prev, ...updates } : prev));
   }, []);
 
-  const addEnvRow = useCallback(() => {
-    setModalState((prev) => {
-      if (!prev) {
-        return prev;
-      }
-      return {
-        ...prev,
-        envs: [...prev.envs, { id: generateEnvId(), key: '', value: '' }],
-      };
-    });
-  }, []);
-
-  const updateEnvRow = useCallback((envId: string, field: 'key' | 'value', value: string) => {
-    setModalState((prev) => {
-      if (!prev) {
-        return prev;
-      }
-      const envs = prev.envs.map((env) => (env.id === envId ? { ...env, [field]: value } : env));
-      return { ...prev, envs };
-    });
-  }, []);
-
-  const removeEnvRow = useCallback((envId: string) => {
-    setModalState((prev) => {
-      if (!prev) {
-        return prev;
-      }
-      return { ...prev, envs: prev.envs.filter((env) => env.id !== envId) };
-    });
-  }, []);
-
   const mutateMcpoConfig = useCallback(
     async (mutator: (config: McpoConfigObject) => boolean, successMessage: string) => {
       setConfigBusy(true);
@@ -336,36 +300,12 @@ export default function McpCatalogModule() {
               />
             </label>
             <div className="catalog-modal__full-image">Full image: {fullImage}</div>
-            <div className="catalog-modal__env-header">
-              <span>Environment variables</span>
-              <button type="button" onClick={addEnvRow} disabled={modalState.busy}>
-                Add variable
-              </button>
-            </div>
-            <div className="catalog-modal__env-list">
-              {modalState.envs.length === 0 && <div className="catalog-modal__env-empty">No environment variables yet.</div>}
-              {modalState.envs.map((env) => (
-                <div key={env.id} className="catalog-modal__env-row">
-                  <input
-                    type="text"
-                    value={env.key}
-                    onChange={(event) => updateEnvRow(env.id, 'key', event.target.value)}
-                    placeholder="API_KEY"
-                    disabled={modalState.busy}
-                  />
-                  <input
-                    type="text"
-                    value={env.value}
-                    onChange={(event) => updateEnvRow(env.id, 'value', event.target.value)}
-                    placeholder="value"
-                    disabled={modalState.busy}
-                  />
-                  <button type="button" onClick={() => removeEnvRow(env.id)} disabled={modalState.busy}>
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
+            <ArgEnvInputs
+              showArgs={false}
+              envs={modalState.envs}
+              onChangeEnvs={(nextEnvs) => updateModal({ envs: nextEnvs })}
+              disabled={modalState.busy}
+            />
           </div>
           {modalState.error && <div className="catalog-modal__error">{modalState.error}</div>}
           <div className="catalog-modal__footer">
@@ -384,7 +324,7 @@ export default function McpCatalogModule() {
         </div>
       </div>
     );
-  }, [modalState, addEnvRow, closeModal, handleModalSubmit, removeEnvRow, updateEnvRow, updateModal]);
+  }, [closeModal, handleModalSubmit, modalState, updateModal]);
 
   return (
     <div className="rdx-module">
@@ -638,10 +578,6 @@ function removeServerFromConfig(config: McpoConfigObject, serverId: string): boo
   }
   delete config.mcpServers[serverId];
   return true;
-}
-
-function generateEnvId(): string {
-  return `env-${Math.random().toString(36).slice(2, 9)}`;
 }
 
 function formatError(error: unknown): string {
