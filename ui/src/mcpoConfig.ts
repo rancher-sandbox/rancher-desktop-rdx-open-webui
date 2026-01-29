@@ -2,7 +2,7 @@ import { createDockerDesktopClient } from '@docker/extension-api-client';
 
 const ddClient = createDockerDesktopClient();
 
-const EXTENSION_IDENTIFIER = 'rancher-desktop-rdx-open-webui';
+const EXTENSION_IDENTIFIER = 'rancher-desktop-rdx-ai-workbench';
 const MCPO_FILE_NAME = 'config.json';
 const MCPO_RELATIVE_PATH = `linux/mcpo/${MCPO_FILE_NAME}`;
 const EXTENSION_IMAGE = ddClient.extension.image;
