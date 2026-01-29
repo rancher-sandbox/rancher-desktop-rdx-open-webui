@@ -2,7 +2,7 @@ services:
   pipelines:
     image: ghcr.io/open-webui/pipelines:main
     ports:
-      - "11700:9099"
+      - "127.0.0.1:11700:9099"
     volumes:
       - open-webui:/app/pipelines
     environment:
@@ -14,9 +14,9 @@ services:
   grafana:
     image: grafana/otel-lgtm:latest
     ports:
-      - "11605:3000"
-      - "4317:4317"
-      - "4318:4318"
+      - "127.0.0.1:11605:3000"
+      - "127.0.0.1:4317:4317"
+      - "127.0.0.1:4318:4318"
     environment:
       - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_SECURITY_COOKIE_SAMESITE=None
