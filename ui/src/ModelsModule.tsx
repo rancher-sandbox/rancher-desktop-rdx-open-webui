@@ -158,10 +158,7 @@ async function fetchWithFallback(urls: string[], init?: RequestInit) {
 const LLAMAEDGE_CONNECTION_BASE = 'http://host.docker.internal';
 export { OPEN_WEBUI_TOKEN_STORAGE_KEY } from './openWebuiHelpers';
 const DEFAULT_LLAMAEDGE_IMAGES = [
-  'matamagu/qwen2-0.5b-instruct:0.1.0',
-  'matamagu/deepseek-r1-distill-qwen-7b:0.1.0',
-  'matamagu/gemma-3-12b-it:0.1.0',
-  'matamagu/llama-3.2-3b-instruct:0.1.0',
+  'ghcr.io/rancher-sandbox/qwen2-0.5b-instruct:0.1.0'
 ];
 const DEFAULT_LLAMAEDGE_IMAGE_SET = new Set(DEFAULT_LLAMAEDGE_IMAGES);
 
