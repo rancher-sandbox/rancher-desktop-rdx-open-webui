@@ -6,7 +6,7 @@ services:
     volumes:
       - open-webui:/app/pipelines
     environment:
-      - PIPELINES_URLS="https://raw.githubusercontent.com/SUSE/suse-ai-observability-extension/refs/heads/main/integrations/oi-filter/suse_ai_filter.py"
+      - PIPELINES_URLS=https://raw.githubusercontent.com/SUSE/suse-ai-observability-extension/refs/heads/main/integrations/oi-filter/suse_ai_filter.py
       - OTEL_EXPORTER_HTTP_OTLP_ENDPOINT=http://host.docker.internal:4318
       - PRICING_JSON=https://raw.githubusercontent.com/SUSE/suse-ai-observability-extension/refs/heads/main/integrations/oi-filter/pricing.json
       - OTEL_SERVICE_NAME=open-webui
