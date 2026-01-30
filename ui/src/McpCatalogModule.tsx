@@ -60,7 +60,6 @@ interface RunModalState {
   error: string;
 }
 
-const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
 const dateFormatter = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 
 export default function McpCatalogModule() {
