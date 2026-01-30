@@ -85,7 +85,6 @@ async function syncToolServers(servers: McpoServerDefinition[]) {
 async function syncModelToolAssignments(serverIds: string[]) {
   try {
     const uniqueServerIds = Array.from(new Set(serverIds));
-    const desiredToolIds = uniqueServerIds.map((id) => `${TOOL_SERVER_PREFIX}${id}`);
     const modelResponse = await fetchModels();
     const models = modelResponse.data ?? [];
     for (const model of models) {
