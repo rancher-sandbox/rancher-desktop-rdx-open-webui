@@ -1,6 +1,5 @@
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { createDockerDesktopClient } from '@docker/extension-api-client';
-import { toast } from 'react-toastify';
 import WebpageFrame from './WebpageFrame';
 import InstallView from './InstallView';
 import LoadingView from './LoadingView';
