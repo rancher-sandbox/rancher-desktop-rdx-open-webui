@@ -184,15 +184,6 @@ function buildEnvCliArgs(env?: Record<string, string>): string[] {
     .flatMap((entry) => ['-e', `${entry.key}=${entry.value}`]);
 }
 
-const LLAMAEDGE_CONFIG_TEMPLATE: OpenWebUIConfigEntry = {
-  enable: true,
-  tags: [],
-  prefix_id: '',
-  model_ids: [],
-  connection_type: 'external',
-  auth_type: 'bearer',
-};
-
 import {
   fetchOpenWebuiConfigApi,
   updateOpenWebuiConfigApi,
