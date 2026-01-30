@@ -35,17 +35,6 @@ function normalizeType(value: string | undefined): CatalogSourceType {
   return SOURCE_TYPE_FALLBACK;
 }
 
-function cloneSource(source: CatalogSourceDefinition): CatalogSourceDefinition {
-  return {
-    id: source.id,
-    url: source.url,
-    type: source.type,
-    key: source.key ?? '',
-    label: source.label,
-    isDefault: source.isDefault,
-  };
-}
-
 function sanitizeSource(source: Partial<CatalogSourceDefinition> | null | undefined): CatalogSourceDefinition | null {
   if (!source || typeof source !== 'object') {
     return null;
