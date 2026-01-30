@@ -187,10 +187,6 @@ function buildEnvCliArgs(env?: Record<string, string>): string[] {
 import {
   fetchOpenWebuiConfigApi,
   updateOpenWebuiConfigApi,
-  fetchModels,
-  fetchModelDetails,
-  updateModel,
-  createModel,
 } from './openWebuiApi';
 
 async function fetchOpenWebUIConfig(): Promise<OpenWebUIConfig> {
