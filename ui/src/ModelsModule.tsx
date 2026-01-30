@@ -1138,10 +1138,6 @@ export default function ModelsModule() {
     }
   }, [someFilteredSelected, filteredRows.length, activeEngine]);
 
-  const itemSummary = filteredRows.length === activeItems.length
-    ? `${filteredRows.length} ${filteredRows.length === 1 ? 'item' : 'items'}`
-    : `Showing ${filteredRows.length} of ${activeItems.length}`;
-
   const openModal = useCallback((engine: EngineId) => {
     if (engine === 'gguf') {
       setModalState({
