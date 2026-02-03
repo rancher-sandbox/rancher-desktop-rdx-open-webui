@@ -60,8 +60,6 @@ services:
     environment:
       - DEFAULT_USER_ROLE=user
       - WEBUI_AUTH=False
-      - WEBUI_SECRET_KEY=rd-0i-s3cr3t
-      - OPENAI_API_KEY=0p3n-w3bu!
       - WEBUI_SESSION_COOKIE_SAME_SITE=None
       - WEBUI_SESSION_COOKIE_SECURE=True
       - ENABLE_WEB_SEARCH=True

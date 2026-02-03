@@ -12,7 +12,7 @@ export const MCPO_PERSISTENT_SPEC_BASE_PATH = '/var/lib/rdx-mcpo';
 
 export const MCPO_CONFIG_STORAGE_KEY = 'rdx.mcpo-config-cache';
 export const MCPO_SENSITIVE_PLACEHOLDER = '*****';
-const SENSITIVE_KEYWORDS = ['key', 'secret', 'pass', 'password'];
+const SENSITIVE_KEYWORDS = ['key', 'secret', 'pass', 'password', 'token', 'auth', 'credential', 'cert', 'api_key'];
 
 export interface ComposeDetails {
   projectName: string;
@@ -212,7 +212,7 @@ export async function writeConfigToHost(configDir: string, content: string) {
   }
   const encoded = encodeBase64(content);
   const volumeArg = `${configDir}:/rdx-mcpo`;
-  const shellCommand = `printf '%s' '${encoded}' | base64 -d >/rdx-mcpo/${MCPO_FILE_NAME}`;
+  const shellCommand = `echo "$1" | base64 -d >"/rdx-mcpo/${MCPO_FILE_NAME}"`;
   await runDocker([
     '--rm',
     '-v',
@@ -222,6 +222,8 @@ export async function writeConfigToHost(configDir: string, content: string) {
     EXTENSION_IMAGE,
     '-c',
     shellCommand,
+    '--',
+    encoded,
   ]);
 }
 
@@ -258,7 +260,7 @@ async function writeFileToDockerMount(mountSource: string, relativePath: string,
     const shellCommand = [
       'set -e',
       `target="${targetPath}"`,
-      `printf '%s' '${encodedChunk}' | base64 -d >>"$target"`,
+      `echo "$1" | base64 -d >>"$target"`,
     ].join(' && ');
     await runDocker([
       '--rm',
@@ -269,6 +271,8 @@ async function writeFileToDockerMount(mountSource: string, relativePath: string,
       EXTENSION_IMAGE,
       '-c',
       shellCommand,
+      '--',
+      encodedChunk,
     ]);
   }
 }

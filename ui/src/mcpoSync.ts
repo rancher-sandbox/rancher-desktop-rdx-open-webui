@@ -97,6 +97,8 @@ async function syncModelToolAssignments(serverIds: string[]) {
       const preserved = current.filter((id) => !id.startsWith(TOOL_SERVER_PREFIX));
       const merged = [...preserved];
       // gunamata - commented out adding tools to Model config for now
+      // Automatically enabling all tools slows down response generation
+      // so, we leave enabling tools step for the user for now
 /*       desiredToolIds.forEach((toolId) => {
         if (!merged.includes(toolId)) {
           merged.push(toolId);

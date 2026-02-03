@@ -676,11 +676,11 @@ function inferFilenameFromUrl(rawUrl: string): string {
     const parsed = new URL(rawUrl);
     const candidate = parsed.searchParams.get('filename') || parsed.searchParams.get('file');
     if (candidate) {
-      return candidate;
+      return basenameFromPath(candidate);
     }
     const segments = parsed.pathname.split('/').filter(Boolean);
     if (segments.length) {
-      return segments[segments.length - 1];
+      return basenameFromPath(segments[segments.length - 1]);
     }
   } catch {
     // Fall back to simple parsing below.
@@ -688,7 +688,7 @@ function inferFilenameFromUrl(rawUrl: string): string {
   const stripped = rawUrl.split('?')[0]?.split('#')[0] ?? rawUrl;
   const parts = stripped.split('/').filter(Boolean);
   if (parts.length) {
-    return parts[parts.length - 1];
+    return basenameFromPath(parts[parts.length - 1]);
   }
   return 'model.gguf';
 }
@@ -835,17 +835,17 @@ async function downloadGgufFile(sourceUrl: string): Promise<string> {
   const script = `
 set -e
 cd /models
-if [ -e "${targetName}" ]; then
-  echo "${targetName} already exists." >&2
+if [ -e "$TARGET_NAME" ]; then
+  echo "$TARGET_NAME already exists." >&2
   exit 1
 fi
-tmp="${targetName}.download.$$"
-rm -f "\$tmp"
-if ! wget -O "\$tmp" "\$GGUF_URL"; then
-  rm -f "\$tmp"
+tmp="$TARGET_NAME.download.$$"
+rm -f "$tmp"
+if ! wget -O "$tmp" "$GGUF_URL"; then
+  rm -f "$tmp"
   exit 1
 fi
-mv "\$tmp" "${targetName}"
+mv "$tmp" "$TARGET_NAME"
 `;
   await dockerCli('run', [
     '--rm',
@@ -853,6 +853,8 @@ mv "\$tmp" "${targetName}"
     `${GGUF_VOLUME_NAME}:/models`,
     '-e',
     `GGUF_URL=${sourceUrl}`,
+    '-e',
+    `TARGET_NAME=${targetName}`,
     ddClient.extension.image,
     'sh',
     '-c',
@@ -874,14 +876,14 @@ async function uploadGgufFile(hostPath: string): Promise<string> {
   const script = `
 set -e
 cd /models
-if [ -e "${targetName}" ]; then
-  echo "${targetName} already exists." >&2
+if [ -e "$TARGET_NAME" ]; then
+  echo "$TARGET_NAME already exists." >&2
   exit 1
 fi
-tmp="${targetName}.upload.$$"
-rm -f "\$tmp"
-cp /upload-source "\$tmp"
-mv "\$tmp" "${targetName}"
+tmp="$TARGET_NAME.upload.$$"
+rm -f "$tmp"
+cp /upload-source "$tmp"
+mv "$tmp" "$TARGET_NAME"
 `;
   await dockerCli('run', [
     '--rm',
@@ -889,6 +891,8 @@ mv "\$tmp" "${targetName}"
     `${GGUF_VOLUME_NAME}:/models`,
     '-v',
     `${hostPath}:/upload-source:ro`,
+    '-e',
+    `TARGET_NAME=${targetName}`,
     ddClient.extension.image,
     'sh',
     '-c',
@@ -913,12 +917,14 @@ async function deleteGgufFile(fileName: string): Promise<void> {
   const script = `
 set -e
 cd /models
-rm -f "${fileName}"
+rm -f "$TARGET_NAME"
 `;
   await dockerCli('run', [
     '--rm',
     '-v',
     `${GGUF_VOLUME_NAME}:/models`,
+    '-e',
+    `TARGET_NAME=${fileName}`,
     ddClient.extension.image,
     'sh',
     '-c',
