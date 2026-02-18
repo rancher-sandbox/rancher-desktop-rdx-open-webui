@@ -127,7 +127,7 @@ const ENGINE_CONFIG: Record<EngineId, {
     modalDescription: 'Enter a LlamaEdge container image name.',
     inputLabel: 'Container image',
     placeholder: 'myrepo/llamaedge-phi4:latest',
-    helperText: 'Refer to https://llamaedge.com/docs/ai-models/llamaedge-docker to learn how to build your own LlamaEdge contianer image.',
+    helperText: 'Refer to https://llamaedge.com/docs/ai-models/llamaedge-docker to learn how to build your own LlamaEdge container image.',
     submitLabel: 'Run',
     emptyMessage: 'No LlamaEdge containers found. Click Download/Run to start one.',
     actionLabel: 'Download/Run',

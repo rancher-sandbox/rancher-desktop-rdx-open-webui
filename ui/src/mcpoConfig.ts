@@ -246,10 +246,12 @@ async function writeFileToDockerMount(mountSource: string, relativePath: string,
     '-c',
     [
       'set -e',
-      `target="${targetPath}"`,
+      'target="$1"',
       'mkdir -p "$(dirname "$target")"',
       ': >"$target"',
     ].join(' && '),
+    '--',
+    targetPath,
   ]);
   if (!content) {
     return;
@@ -259,8 +261,8 @@ async function writeFileToDockerMount(mountSource: string, relativePath: string,
     const encodedChunk = encodeBase64(chunk);
     const shellCommand = [
       'set -e',
-      `target="${targetPath}"`,
-      `echo "$1" | base64 -d >>"$target"`,
+      'target="$1"',
+      'echo "$2" | base64 -d >>"$target"',
     ].join(' && ');
     await runDocker([
       '--rm',
@@ -272,6 +274,7 @@ async function writeFileToDockerMount(mountSource: string, relativePath: string,
       '-c',
       shellCommand,
       '--',
+      targetPath,
       encodedChunk,
     ]);
   }
