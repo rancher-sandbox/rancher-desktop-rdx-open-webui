@@ -74,12 +74,12 @@ const ToastNotification = () => {
 
     return (
         <ToastContainer
-            position="bottom-right"
+            position="top-right"
             theme={isDarkMode ? "dark" : "light"}
             hideProgressBar
             newestOnTop
             closeOnClick={false}
-            autoClose={false}
+            autoClose={15000}
             rtl={false}
             pauseOnFocusLoss
             draggable

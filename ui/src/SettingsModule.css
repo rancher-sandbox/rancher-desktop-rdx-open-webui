@@ -1,0 +1,238 @@
+.settings-card {
+  background: rgba(20, 33, 43, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-card--sources {
+  gap: 1.25rem;
+}
+
+.settings-token-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.settings-token-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.settings-token-label > span {
+  font-weight: 600;
+}
+
+.settings-token-field textarea {
+  min-height: 6rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(13, 22, 32, 0.9);
+  color: var(--rdx-text-primary);
+  padding: 0.9rem;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.settings-token-field textarea:focus {
+  outline: 2px solid rgba(30, 108, 204, 0.45);
+  outline-offset: 1px;
+}
+
+.settings-description {
+  white-space: nowrap;
+}
+
+.settings-description--multiline {
+  white-space: nowrap;
+}
+
+.settings-helper {
+  color: var(--rdx-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.settings-token-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.settings-button {
+  border-radius: 8px;
+  padding: 0.46rem 1rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(28, 42, 51, 0.16);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--rdx-text-primary);
+  transition: background var(--rdx-transition), color var(--rdx-transition), border-color var(--rdx-transition), box-shadow var(--rdx-transition);
+}
+
+.settings-button.settings-button--ghost {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.settings-button.settings-button--ghost:not(:disabled):hover {
+  background: rgba(28, 42, 51, 0.08);
+  border-color: rgba(28, 42, 51, 0.22);
+}
+
+.settings-button.settings-button--primary {
+  border: none;
+  background: linear-gradient(135deg, #1f9cf0, #34a6ff);
+  color: #ffffff;
+}
+
+.settings-button.settings-button--primary:not(:disabled):hover {
+  filter: brightness(1.05);
+}
+
+.settings-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.settings-sources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-source {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  background: rgba(10, 18, 28, 0.65);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.settings-source--default {
+  border-color: rgba(48, 137, 255, 0.45);
+}
+
+.settings-source__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
+.settings-source__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.settings-source__title {
+  font-weight: 600;
+}
+
+.settings-source__subtitle {
+  font-size: 0.85rem;
+  color: var(--rdx-text-muted);
+}
+
+.settings-source__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.settings-source__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1 1 220px;
+  min-width: 200px;
+}
+
+.settings-source__field--grow {
+  flex: 2 1 320px;
+}
+
+.settings-source__field input,
+.settings-source__field select {
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(13, 22, 32, 0.9);
+  color: var(--rdx-text-primary);
+  padding: 0.55rem 0.7rem;
+  font-size: 0.92rem;
+}
+
+.settings-source__field select {
+  min-height: 2.4rem;
+}
+
+.settings-source__field input:disabled,
+.settings-source__field select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settings-source__key-control {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.settings-source__key-control input {
+  flex: 1 1 240px;
+  min-width: 200px;
+}
+
+.settings-source__error {
+  color: #ff8a8a;
+  font-size: 0.85rem;
+}
+
+.settings-sources-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+@media (prefers-color-scheme: light) {
+  .settings-card {
+    background: #ffffff;
+    border-color: rgba(28, 42, 51, 0.08);
+  }
+
+  .settings-token-field textarea {
+    background: #ffffff;
+    border-color: rgba(28, 42, 51, 0.14);
+  }
+
+  .settings-button.settings-button--ghost {
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .settings-button.settings-button--ghost:not(:disabled):hover {
+    background: rgba(28, 42, 51, 0.08);
+  }
+
+  .settings-source {
+    background: #f7f9fd;
+    border-color: rgba(28, 42, 51, 0.12);
+  }
+
+  .settings-source__field input,
+  .settings-source__field select {
+    background: #ffffff;
+    border-color: rgba(28, 42, 51, 0.14);
+  }
+}
