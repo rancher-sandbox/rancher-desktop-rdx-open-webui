@@ -1,5 +1,5 @@
 {
-  "icon": "open-webui.svg",
+  "icon": "workbench.svg",
   "vm": {
     "composefile": "docker-compose.yaml"
   },

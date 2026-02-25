@@ -1,6 +1,6 @@
-# Open WebUI docker extension
+# AI Workbench docker extension
 
-docker extension that installs and configures [Ollama](https://ollama.com/), [Open WebUI](https://docs.openwebui.com/), a tiny open source LLM (tinyllama) on top of Rancher Desktop for local GenAI exploration & development.
+docker extension that installs and configures [Ollama](https://ollama.com/), [llama.cpp](https://github.com/ggml-org/llama.cpp), [LlamaEdge](https://llamaedge.com/), [Open WebUI](https://docs.openwebui.com/), a tiny open source LLM (tinyllama) on top of Rancher Desktop for local GenAI exploration & development.
 
 ## How to install
 
