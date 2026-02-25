@@ -38,7 +38,7 @@ LABEL org.opencontainers.image.title="AI Workbench" \
     org.opencontainers.image.vendor="SUSE LLC" \
     com.docker.desktop.extension.api.version="0.3.4" \
     com.docker.extension.screenshots="" \
-    com.docker.desktop.extension.icon="https://raw.githubusercontent.com/rancher-sandbox/rancher-desktop-rdx-open-webui/refs/tags/v0.0.6/open-webui.svg" \
+    com.docker.desktop.extension.icon="https://raw.githubusercontent.com/rancher-sandbox/rancher-desktop-rdx-ai-workbench/refs/tags/v0.2.0/workbench.svg" \
     com.docker.extension.detailed-description="" \
     com.docker.extension.publisher-url="" \
     com.docker.extension.additional-urls="" \
@@ -47,7 +47,7 @@ LABEL org.opencontainers.image.title="AI Workbench" \
 
 COPY docker-compose.yaml .
 COPY metadata.json .
-COPY open-webui.svg .
+COPY workbench.svg .
 COPY --from=client-builder /ui/build ui
 COPY --from=builder /installer/bin/installer-linux /linux/installer
 COPY --from=builder /installer/bin/installer-darwin /darwin/installer

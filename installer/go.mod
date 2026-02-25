@@ -1,4 +1,4 @@
-module github.com/rancher-sandbox/rd-open-webui-docker-ext/installer
+module github.com/rancher-sandbox/rd-ai-workbench-docker-ext/installer
 
 go 1.24.0
 
